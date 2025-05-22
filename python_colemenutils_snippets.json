@@ -1,0 +1,222 @@
+{
+	"Import Colemen Utils": {
+		"prefix": ["import colemen utils","importcolemenutils"],
+		"body": [
+			"import colemen_utils as c"
+		],
+		"description": "Import the colemen utils library."
+	},
+	"errorlog": {
+		"prefix": ["error log","errorlog","logerror"],
+		"body": [
+			"c.con.log(f\"${1:message}\",\"error\")"
+		],
+		"description": "Log an error to the console"
+	},
+	"warninglog": {
+		"prefix": ["warning log","warninglog","logwarning"],
+		"body": [
+			"c.con.log(f\"${1:message}\",\"warning\")"
+		],
+		"description": "Log a warning to the console"
+	},
+	"Getkwarg": {
+		"prefix": ["getkwarg","get kwarg"],
+		"body": [
+			"${1:keys} = c.obj.get_kwarg([\"${1:keys}\"],${2:default},(${3:types}),**kwargs)"
+		],
+		"description": "Get a key from the kwargs"
+	},
+	"Getarg": {
+		"prefix": ["getarg","get arg"],
+		"body": [
+			"${1:keys} = c.obj.get_arg(${4:args},[\"${1:keys}\"],${2:default},(${3:types}))"
+		],
+		"description": "Get a key from a dictionary."
+	},
+	"Rand": {
+		"prefix": ["rand string","randstring"],
+		"body": [
+			"c.rand.rand(${length:12})"
+		],
+		"description": "Generate a random string"
+	},
+	"colemenUtils-RandomBoolean": {
+		"prefix": ["rand boolean","randboolean"],
+		"body": [
+			"c.rand.boolean(${1:bias})"
+		],
+		"description": "Generate a random boolean"
+	},
+	"Read a file": {
+		"prefix": ["readfile","read file"],
+		"body": [
+			"c.file.read(${1:file_path})"
+		],
+		"description": "Read a file."
+	},
+	"Read a Json file": {
+		"prefix": ["readjsonfile","read json file"],
+		"body": [
+			"c.file.read.as_json(${1:file_path})"
+		],
+		"description": "Read a json file."
+	},
+	"Write a json file": {
+		"prefix": ["writejsonfile","write json file"],
+		"body": [
+			"c.file.writer.to_json(${1:file_path},${2:contents})"
+		],
+		"description": "Write a json file."
+	},
+	"Write a file": {
+		"prefix": ["writejsonfile","write file"],
+		"body": [
+			"c.file.write(${1:file_path},${2:contents})"
+		],
+		"description": "Write a file."
+	},
+	"Deletefile": {
+		"prefix": ["deletefile","delete file"],
+		"body": [
+			"c.file.delete(${1:file_path})"
+		],
+		"description": "Delete a file."
+	},
+	"Getfiles": {
+		"prefix": ["getfiles","get files"],
+		"body": [
+			"${1:files} = c.file.get_files(${2:file_path})"
+		],
+		"description": "Get the files from a directory."
+	},
+	"Fileappend": {
+		"prefix": ["fileappend","file append"],
+		"body": [
+			"c.file.append(${1:file_path},${2:contents})"
+		],
+		"description": "Append to a file."
+	},
+	"Stripnulls": {
+		"prefix": ["stripnulls","strip nulls"],
+		"body": [
+			"c.arr.strip_nulls(${1:array})"
+		],
+		"description": "Strip nulls from an array."
+	},
+	"Removeduplicates": {
+		"prefix": ["removeduplicates","remove duplicates"],
+		"body": [
+			"c.arr.remove_duplicates(${1:array})"
+		],
+		"description": "Strip duplicates from an array."
+	},
+	"LongestString": {
+		"prefix": ["longestString","longest string"],
+		"body": [
+			"c.arr.longest_string(${1:array})"
+		],
+		"description": "Get the longest string in an array."
+	},
+	"Fileexists": {
+		"prefix": ["fileexists","file exists"],
+		"body": [
+			"c.file.exists(${1:file_path})"
+		],
+		"description": "Check if a file exists."
+	},
+	"Direxists": {
+		"prefix": ["direxists","dir exists"],
+		"body": [
+			"c.dir.exists(${1:dir_path})"
+		],
+		"description": "Check if a dir exists."
+	},
+	"Getuniquekeys": {
+		"prefix": ["getuniquekeys","get unique keys"],
+		"body": [
+			"c.obj.get_unique_keys(${1:path})"
+		],
+		"description": "GEt a list of unique keys from a dictionary."
+	},
+	"Formatfilepath": {
+		"prefix": ["formatfilepath","format file path"],
+		"body": [
+			"c.string.file_path(${1:path})"
+		],
+		"description": "FOrmat a file path."
+	},
+	"DetermineBool": {
+		"prefix": ["determineBool","determine boolean"],
+		"body": [
+			"c.string.determine_boolean(${1:value})"
+		],
+		"description": "Determine the boolean value of a string."
+	},
+	"Generatetypos": {
+		"prefix": ["generatetypos","generate typos"],
+		"body": [
+			"c.string.generate_typos(${1:value})"
+		],
+		"description": "Generate typos of the string."
+	},
+	"Tobool": {
+		"prefix": ["tobool","to bool"],
+		"body": [
+			"c.types.to_bool(${1:value})"
+		],
+		"description": "Convert the value to a boolean"
+	},
+	"SetDefaults": {
+		"prefix": ["setDefaults","set defaults"],
+		"body": [
+			"c.types.set_defaults(${1:default_values},${2:object})"
+		],
+		"description": "Set the default values in a dictionary."
+	},
+	"Find list difference": {
+		"prefix": ["find list difference","findlistdiff"],
+		"body": [
+			"c.arr.find_list_diff(${1:array one},${2:array two})"
+		],
+		"description": "find elements in list_one that do not exist in list_two."
+	},
+	"Cmd": {
+		"prefix": ["cmd","cmd ","method docblock"],
+		"body": [
+			"    '''",
+			"        ${1:description}",
+			"",
+			"        ----------",
+			"",
+			"        Arguments",
+			"        -------------------------",
+			"        `arg_name` {type}",
+			"                arg_description",
+			"",
+			"        Keyword Arguments",
+			"        -------------------------",
+			"        `arg_name` {type}",
+			"                arg_description",
+			"",
+			"        Return {type}",
+			"        ----------------------",
+			"        return_description",
+			"",
+			"        Meta",
+			"        ----------",
+			"        `author`: Colemen Atwood",
+			"        `created`: $CURRENT_DATE-$CURRENT_MONTH-$CURRENT_YEAR $CURRENT_HOUR:$CURRENT_MINUTE:$CURRENT_SECOND",
+			"        `version`: 0.0.1",
+			"        `method_name`: ${2:method name}",
+			"        * @TODO []: documentation for ${2:method name}",
+			"    '''"
+		],
+		"description": "Create a method documentation block."
+	}
+
+
+
+
+
+}

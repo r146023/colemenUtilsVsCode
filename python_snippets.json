@@ -1,0 +1,293 @@
+{
+	"or operator": {
+		"prefix": ["or"],
+		"body": [
+			"|| "
+		],
+		"description": "Or operator"
+	},
+	"and operator": {
+		"prefix": ["and"],
+		"body": [
+			"&& "
+		],
+		"description": "and operator"
+	},
+	"equals operator": {
+		"prefix": ["equals"],
+		"body": [
+			"== "
+		],
+		"description": "equals operator"
+	},
+	"is operator": {
+		"prefix": ["is"],
+		"body": [
+			"== "
+		],
+		"description": "is operator"
+	},
+	"is not operator": {
+		"prefix": ["is not","isnt"],
+		"body": [
+			"!== "
+		],
+		"description": "is not operator"
+	},
+	"unix timestamp": {
+		"prefix": ["unix ","unixtimestamp"],
+		"body": [
+			"datetime.datetime.now(tz=datetime.timezone.utc).timestamp()"
+		],
+		"description": "The unix timestamp adjusted for the UTC timezone."
+	},
+
+
+	"isbool": {
+		"prefix": ["is bool","isbool"],
+		"body": [
+			"isinstance(${1:value},(bool))"
+		],
+		"description": "if the value is a boolean."
+	},
+	"isstring": {
+		"prefix": ["is string","isstring"],
+		"body": [
+			"isinstance(${1:value},(str))"
+		],
+		"description": "if the value is a string."
+	},
+	"isdict": {
+		"prefix": ["is dict","isdict"],
+		"body": [
+			"isinstance(${1:value},(dict))"
+		],
+		"description": "if the value is a dict."
+	},
+	"islist": {
+		"prefix": ["is list","islist","is array","isarray"],
+		"body": [
+			"isinstance(${1:value},(list))"
+		],
+		"description": "if the value is a list."
+	},
+	"istuple": {
+		"prefix": ["is tuple","istuple"],
+		"body": [
+			"isinstance(${1:value},(tuple))"
+		],
+		"description": "if the value is a tuple."
+	},
+	"isint": {
+		"prefix": ["is int","isint","is number","isnumber"],
+		"body": [
+			"isinstance(${1:value},(int))"
+		],
+		"description": "if the value is a int."
+	},
+	"isfloat": {
+		"prefix": ["is float","isfloat"],
+		"body": [
+			"isinstance(${1:value},(float))"
+		],
+		"description": "if the value is a float."
+	},
+
+
+
+
+	"sleep": {
+		"prefix": ["sleep"],
+		"body": [
+			"time.sleep($1)$2"
+		],
+		"description": "Set a sleep timer."
+	},
+	"time": {
+		"prefix": ["time"],
+		"body": [
+			"time.time()"
+		],
+		"description": "Get the current unix timestamp"
+	},
+
+
+
+	"len": {
+		"prefix": ["length","count"],
+		"body": [
+			"len($1)"
+		],
+		"description": "Call the len method"
+	},
+	"print": {
+		"prefix": ["print","fprint","printf"],
+		"body": [
+			"print(f\"$1\")$2"
+		],
+		"description": "Call the print method"
+	},
+	"print same line": {
+		"prefix": ["prints","sprint","printsameline","print same line"],
+		"body": [
+			"print(f\"$1\",flush=True,end='\\r')$2"
+		],
+		"description": "Call the print method to print to the same line."
+	},
+	"push": {
+		"prefix": ["push","append"],
+		"body": [
+			"append($1)$2"
+		],
+		"description": "Call the push method"
+	},
+
+
+
+	"starttime": {
+		"prefix": ["starttime","start time"],
+		"body": [
+			"start_time = time.time()"
+		],
+		"description": "Set the start time variable"
+	},
+	"endtime": {
+		"prefix": ["endtime","end time"],
+		"body": [
+			"end_time = time.time()"
+		],
+		"description": "Set the end time variable"
+	},
+	"colemenUtils-ifs": {
+		"prefix": ["ifs "],
+		"body": [
+			"${1:variable} = ${2:value when true} if ${3:condition} else ${4:value when false}"
+		],
+		"description": "Single line or ternary if statement."
+	},
+	"colemenUtils-if": {
+		"prefix": ["if "],
+		"body": [
+			"if ${1:condition}:\n    "
+		],
+		"description": "Single line or ternary if statement."
+	},
+	"colemenUtils-forDict": {
+		"prefix": ["fordict","for dict"],
+		"body": [
+			"for ${1:key},${2:value} in ${3:data}.items():",
+			"    $4"
+		],
+		"description": "Split a string by the delimiter provided"
+	},
+	"split": {
+		"prefix": ["split"],
+		"body": [
+			"$1.split(\"${2:delimeter}\")"
+		],
+		"description": "Split a string by the delimiter provided"
+	},
+	"join": {
+		"prefix": ["join"],
+		"body": [
+			"'${1:delimeter}'.join(${2:array})"
+		],
+		"description": "Join an array by the delimiter provided"
+	},
+	"Current working directory": {
+		"prefix": ["cwd","getcwd","wd","get cwd"],
+		"body": [
+			"os.getcwd()"
+		],
+		"description": "Get this scripts current working directory."
+	},
+	"getter": {
+		"prefix": ["getter"],
+		"body": [
+			"    @property",
+			"    def ${1:property name}(self):",
+			"       '''",
+			"        ${2: description}",
+			"",
+			"        `default`:${4:None}",
+			"",
+			"",
+			"        Meta",
+			"        ----------",
+			"        `@author`: Colemen Atwood",
+			"        `@created`: $CURRENT_MONTH:$CURRENT_DATE:$CURRENT_YEAR $CURRENT_HOUR:$CURRENT_MINUTE:$CURRENT_SECOND",
+			"        `@property`: ${1:property name}",
+			"        '''",
+			"       value = c.obj.get_arg(self.data,['${1:property name}'],${4:None},(${3:property type}))",
+			"       if value is None:",
+			"           value = True",
+			"           self.data['${1:property name}'] = value",
+			"       return value"
+		],
+		"description": "Create a getter method for this class."
+	},
+	"setter": {
+		"prefix": ["setter"],
+		"body": [
+			"    @${1:property name}.setter",
+			"    def ${1:property name}(self,value):",
+			"       '''",
+			"        ${2: description}",
+			"",
+			"        `default`:${4:None}",
+			"",
+			"",
+			"        Meta",
+			"        ----------",
+			"        `@author`: Colemen Atwood",
+			"        `@created`: $CURRENT_MONTH:$CURRENT_DATE:$CURRENT_YEAR $CURRENT_HOUR:$CURRENT_MINUTE:$CURRENT_SECOND",
+			"        `@property`: ${1:property name}",
+			"        '''",
+			"       self.data['${1:property name}'] = value"
+		],
+		"description": "Create a setter method for this class."
+	},
+	"Upper": {
+		"prefix": ["upper","upper case","uppercase"],
+		"body": [
+			"upper()"
+		],
+		"description": "COnvert a string to uppercase."
+	},
+	"Lower": {
+		"prefix": ["lower","lower case","lowercase"],
+		"body": [
+			"lower()"
+		],
+		"description": "COnvert a string to lowercase."
+	},
+	"Hasattr": {
+		"prefix": ["hasattr","has attr"],
+		"body": [
+			"hasattr(${1:object},\"${2:attribute}\")"
+		],
+		"description": "Check if an object has an attribute"
+	},
+	"Getattr": {
+		"prefix": ["getattr","get attr"],
+		"body": [
+			"getattr(${1:object},\"${2:attribute}\")"
+		],
+		"description": "Check if an object get an attribute"
+	},
+	"List comprehension": {
+		"prefix": ["list comprehension","list comp","listcomp"],
+		"body": [
+			"${1:output var} = [x for x in ${2:list name}]",
+			"$3"
+		],
+		"description": "Create a list comprehension."
+	}
+
+
+
+
+
+}
+
+

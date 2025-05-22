@@ -1,0 +1,240 @@
+{
+	"testicles": {
+		"scope":"javascript,typescript",
+		"prefix": "testicle",
+		"body": [
+			"// smolTiddyGothGirl"
+		],
+		"description": "Log output to console"
+	},
+	"Log to console": {	
+		"prefix": "loggy",
+		"body": [
+			"console.log('$1');",
+			"$2"
+		],
+		"description": "Log output to console"
+	},
+	"or operator": {
+		"prefix": "or",
+		"body": [
+			"|| "
+		],
+		"description": "Or operator"
+	},
+	"and operator": {
+		"prefix": "and",
+		"body": [
+			"&& "
+		],
+		"description": "and operator"
+	},
+	"equals operator": {
+		"prefix": "equals",
+		"body": [
+			"== "
+		],
+		"description": "equals operator"
+	},
+	"is operator": {
+		"prefix": "is",
+		"body": [
+			"== "
+		],
+		"description": "is operator"
+	},
+	"is not operator": {
+		"prefix": "is not",
+		"body": [
+			"!= "
+		],
+		"description": "is not operator"
+	},
+	"has class": {
+		"prefix": ["has class","hasclass"],
+		"body": [
+			"hasClass('$1')$2"
+		],
+		"description": "has class"
+	},
+	"if has class": {
+		"prefix": "if has class",
+		"body": [
+			"if($('$1').hasClass('$2'))$3"
+		],
+		"description": "Jquery if has class"
+	},
+	"selid": {
+		"prefix": "selid",
+		"body": [
+			"$('#$1')$2"
+		],
+		"description": "Jquery select by id."
+	},
+	"selclass": {
+		"prefix": "selclass",
+		"body": [
+			"$('.$1')$2"
+		],
+		"description": "Jquery select by class."
+	},
+	"attrid": {
+		"prefix": "attrid",
+		"body": [
+			"attr('id')"
+		],
+		"description": "Jquery select by class."
+	},
+
+
+
+	"isfalse": {
+		"prefix": ["isfalse","is false"],
+		"body": [
+			"=== false"
+		],
+		"description": "if the preceding value is equal to false."
+	},
+
+	"isnotfalse": {
+		"prefix": ["isnotfalse","is not false"],
+		"body": [
+			"!= false"
+		],
+		"description": "if the preceding value is not equal to false."
+	},
+	"isnottrue": {
+		"prefix": ["isnottrue","is not true"],
+		"body": [
+			"!= true"
+		],
+		"description": "if the preceding value isnot equal to true."
+	},
+
+
+	"isundefined": {
+		"prefix": ["isundefined","is undefined"],
+		"body": [
+			"== undefined"
+		],
+		"description": "if the preceding value is equal to undefined."
+	},
+	"isnotundefined": {
+		"prefix": ["isnotundefined","is not undefined"],
+		"body": [
+			"!= undefined"
+		],
+		"description": "if the preceding value is not undefined."
+	},
+
+
+	"isnull": {
+		"prefix": ["isnull","is null"],
+		"body": [
+			"== null"
+		],
+		"description": "if the preceding value is equal to null."
+	},
+	"isnotnull": {
+		"prefix": ["isnotnull","is not null"],
+		"body": [
+			"!= null"
+		],
+		"description": "if the preceding value is not null."
+	},
+
+
+	"isbool": {
+		"prefix": ["isbool","is bool"],
+		"body": [
+			"if(typeof $1 == \"boolean\"){",
+			"    $2",
+			"}"
+		],
+		"description": "if the preceding value is a boolean."
+	},
+	"isnotbool": {
+		"prefix": ["isnotbool","is not bool"],
+		"body": [
+			"if(typeof $1 != \"boolean\"){",
+			"    $2",
+			"}"
+		],
+		"description": "if the preceding value is not boolean."
+	},
+
+
+	"isnumber": {
+		"prefix": ["isnumber","is number"],
+		"body": [
+			"if(typeof $1 == \"number\"){",
+			"    $2",
+			"}"
+		],
+		"description": "if the preceding value is a number."
+	},
+	"isnotnumber": {
+		"prefix": ["isnotnumber","is not number"],
+		"body": [
+			"if(typeof $1 != \"number\"){",
+			"    $2",
+			"}"
+		],
+		"description": "if the preceding value is not number."
+	},
+
+
+	"isstring": {
+		"prefix": ["isstring","is string"],
+		"body": [
+			"if(typeof $1 == \"string\"){",
+			"    $2",
+			"}"
+		],
+		"description": "if the preceding value is a string."
+	},
+	"isnotstring": {
+		"prefix": ["isnotstring","is not string"],
+		"body": [
+			"if(typeof $1 != \"string\"){",
+			"    $2",
+			"}"
+		],
+		"description": "if the preceding value is not string."
+	},
+
+
+	"ifisarray": {
+		"prefix": ["ifisarray","if is array"],
+		"body": [
+			"if(Array.isArray($1)){",
+			"    $2",
+			"}"
+		],
+		"description": "if the preceding value is a array."
+	},
+	"ifisnotarray": {
+		"prefix": ["ifisnotarray","if is not array"],
+		"body": [
+			"if(Array.isArray($1) == false){",
+			"    $2",
+			"}"
+		],
+		"description": "if the preceding value is not array."
+	},
+	
+	"import Cryptadia": {
+		"prefix": ["import Cryptadia","importCryptadia"],
+		"body": [
+			"import Cryptadia from 'cryptadia-core';",
+			"const utils = Cryptadia.utils;"
+		],
+		"description": "Import the cryptadia utility library."
+	}
+
+
+
+
+
+
+}

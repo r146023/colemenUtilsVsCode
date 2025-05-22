@@ -1,0 +1,10 @@
+{
+	"markddown link": {
+		"prefix": ["link","url"],
+		"body": [
+			"[$1]($2)"
+		],
+		"description": "Add a link to the document."
+	}
+
+}

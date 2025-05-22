@@ -1,0 +1,82 @@
+
+
+
+Reverse Windows Path
+---
+Locates any windows path on the current line and reverses the slashes
+
+
+
+Z:\Structure\Ra9\2022\22-0026 - colemenVsCodeExtension\colemenutils
+
+path = "Z:\Structure\Ra9\2022\22-0026 - colemenVsCodeExtension\colemenutils"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Explode by Delimiter
+Finds the most commonly occuring non-alphanumeric character and splits the file by it.
+
+velma
+"daphne is a bitch; she brings nothing to mystery.inc"
+true
+false
+
+"i"
+"hate"
+"typing"
+"this"
+"example"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+velma
+"daphne is a bitch; she brings nothing to mystery.inc"
+true
+false
+
+"i"
+"hate"
+"typing"
+"this"
+"example"
+
+
+
+Explode by Delimiter--
+Finds the most commonly occuring non-alphanumeric character and splits the file by it.
+
+It ignores spaces,newlines, carriage returns, double and single quotes.
+
+Delimiters that are wrapped within quotes, like "daphne, you bitch" will be ignored as well.
+You can also escape the delimiter by doubling it:
+
+"daphne, you bitch" => daphne, you bitch
+
+
+

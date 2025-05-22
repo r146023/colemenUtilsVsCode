@@ -1,0 +1,19 @@
+{
+	"testicles": {
+		"scope":"javascript,typescript",
+		"prefix": "testicle",
+		"body": [
+			"// smolTiddyGothGirl - TYPE SCRIPT REACT SNIPPET"
+		],
+		"description": "Log output to console"
+	},
+	"useState": {
+		"prefix": "useState",
+		"body": [
+			"const [${1:stateKeyName}, set${1:stateKeyName}] = useState(${2:Default Value});"
+		],
+		"description": "Create a new value on a functional components state."
+	}
+
+
+}

@@ -1,0 +1,71 @@
+{
+	"SQL var char": {
+		"prefix": ["var char","varchar"],
+		"body": [
+			"varchar(${1:size})"
+		],
+		"description": "Varchar SQL type."
+	},
+	"SQL left join": {
+		"prefix": ["leftjoin","left join"],
+		"body": [
+			"SELECT *",
+			"FROM ${1:table_one}",
+			"LEFT JOIN ${2:table_two}",
+			"ON ${2:table_two}.${3:column name} = ${1:table_one}.${3:column name};"
+		],
+		"description": "SQL Left Join Template."
+	},
+	"Procedure TEmplate": {
+		"prefix": ["procedure"],
+		"body": [
+			"DROP PROCEDURE IF EXISTS `sp_${1:procedure name}`;",
+			"DELIMITER $$",
+			"    CREATE PROCEDURE `sp_${1:procedure name}`(IN `argname` argType, OUT `outArgName` argType)",
+			"        READS SQL DATA",
+			"    BEGIN",
+			"$2",
+			"    END$$",
+			"DELIMITER ;"
+		],
+		"description": "Procedure Template."
+	},
+	"SQL foreign key checks": {
+		"prefix": ["foreign key check","foreignkeycheck"],
+		"body": [
+			"SET FOREIGN_KEY_CHECKS=${1:OnOff};"
+		],
+		"description": "SQL Select Statement"
+	},
+	"SQL Select Statement": {
+		"prefix": ["sql select"],
+		"body": [
+			"SELECT * FROM `${1:table name}`;"
+		],
+		"description": "SQL Select Statement"
+	},
+	"SQL Where": {
+		"prefix": ["where"],
+		"body": [
+			"WHERE ${1:column}=:${2:placeholder}"
+		],
+		"description": "SQL Where"
+	},
+	"SQL insert into": {
+		"prefix": ["insert into","insertinto"],
+		"body": [
+			"INSERT INTO ${1:table name} (${2:columns})",
+			"VALUES (${3:values});"
+		],
+		"description": "SQL insert into"
+	},
+	"SQL update": {
+		"prefix": ["update"],
+		"body": [
+			"UPDATE ${1:table name}",
+			"SET ${2:column name} = ${3:value}",
+			"WHERE ${2:column name}=:${4:column value};"
+		],
+		"description": "SQL update"
+	}
+}

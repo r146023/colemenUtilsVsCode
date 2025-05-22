@@ -1,0 +1,10 @@
+velma
+amanda
+carla
+daphne
+1.88
+true
+
+
+
+

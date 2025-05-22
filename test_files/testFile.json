@@ -1,0 +1,105 @@
+{
+    "description": "The ID used to externally identify the row",
+    "ct": "column",
+    "hash_id_prefix":"boobies",
+    "options": {
+        "create": {
+            "query_params": false,
+            "url_params": false,
+            "body_params": false,
+            "required": false,
+            "default": "__VALUE_NOT_SET__",
+            "susurrus_methods": [],
+            "validation": {
+                "is_boobs": null,
+                "hash_id": true,
+                "boolean": false,
+                "ip_address": false,
+                "phone_number": false,
+                "is_email": false,
+                "url": false,
+                "regex": null,
+                "min_value": null,
+                "max_value": null,
+                "min_length": null,
+                "max_length": null,
+                "alpha_numeric_only": false,
+                "numeric_only": false,
+                "value_options": null
+            }
+        },
+        "read": {
+            "query_params": true,
+            "url_params": true,
+            "body_params": false,
+            "required": false,
+            "default": "__VALUE_NOT_SET__",
+            "susurrus_methods": [],
+            "validation": {
+                "hash_id": false,
+                "boolean": false,
+                "ip_address": false,
+                "phone_number": false,
+                "is_email": false,
+                "url": false,
+                "regex": null,
+                "min_value": null,
+                "max_value": null,
+                "min_length": null,
+                "max_length": null,
+                "alpha_numeric_only": false,
+                "numeric_only": false,
+                "value_options": null
+            },
+            "nullable": true
+        },
+        "update": {
+            "query_params": false,
+            "url_params": true,
+            "body_params": true,
+            "required": false,
+            "default": "__VALUE_NOT_SET__",
+            "susurrus_methods": [],
+            "validation": {
+                "hash_id": false,
+                "boolean": false,
+                "ip_address": false,
+                "phone_number": false,
+                "is_email": false,
+                "url": false,
+                "regex": null,
+                "min_value": null,
+                "max_value": null,
+                "min_length": null,
+                "max_length": null,
+                "alpha_numeric_only": false,
+                "numeric_only": false,
+                "value_options": null
+            }
+        },
+        "delete": {
+            "query_params": false,
+            "url_params": true,
+            "body_params": false,
+            "required": false,
+            "default": "__VALUE_NOT_SET__",
+            "susurrus_methods": [],
+            "validation": {
+                "hash_id": false,
+                "boolean": false,
+                "ip_address": false,
+                "phone_number": false,
+                "is_email": false,
+                "url": false,
+                "regex": null,
+                "min_value": null,
+                "max_value": null,
+                "min_length": null,
+                "max_length": null,
+                "alpha_numeric_only": false,
+                "numeric_only": false,
+                "value_options": null
+            }
+        }
+    }
+}

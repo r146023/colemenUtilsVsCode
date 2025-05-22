@@ -1,0 +1,119 @@
+{
+	"or operator": {
+		"prefix": ["or"],
+		"body": [
+			"|| "
+		],
+		"description": "Or operator"
+	},
+	"and operator": {
+		"prefix": ["and"],
+		"body": [
+			"&& "
+		],
+		"description": "and operator"
+	},
+	"equals operator": {
+		"prefix": ["equals"],
+		"body": [
+			"== "
+		],
+		"description": "equals operator"
+	},
+	"is operator": {
+		"prefix": ["is"],
+		"body": [
+			"== "
+		],
+		"description": "is operator"
+	},
+	"is not operator": {
+		"prefix": ["is not","isnt"],
+		"body": [
+			"!== "
+		],
+		"description": "is not operator"
+	},
+
+
+
+	
+	"isboolean": {
+		"prefix": ["isboolean","is boolean"],
+		"body": [
+			"is_bool($1)$2"
+		],
+		"description": "If value is a boolean"
+	},
+	"isarray": {
+		"prefix": ["isarray","is array"],
+		"body": [
+			"is_array($1)$2"
+		],
+		"description": "If value is a array"
+	},
+	"isnull": {
+		"prefix": ["isnull","is null"],
+		"body": [
+			"is_null($1)$2"
+		],
+		"description": "If value is null"
+	},
+	"isint": {
+		"prefix": ["isint","is int"],
+		"body": [
+			"is_int($1)$2"
+		],
+		"description": "If value is a integer"
+	},
+	"isfloat": {
+		"prefix": ["isfloat","is float","is float"],
+		"body": [
+			"is_float($1)$2"
+		],
+		"description": "If value is an float"
+	},
+	"isstring": {
+		"prefix": ["isstring","is string","is string"],
+		"body": [
+			"is_string($1)$2"
+		],
+		"description": "If value is an string"
+	},
+	"isobject": {
+		"prefix": ["isobject","is object","is object"],
+		"body": [
+			"is_object($1)$2"
+		],
+		"description": "If value is an object"
+	},
+	"isnumeric": {
+		"prefix": ["isnumeric","is numeric"],
+		"body": [
+			"is_numeric($1)$2"
+		],
+		"description": "If value is an numeric"
+	},
+
+
+
+
+	"fileread": {
+		"prefix": ["fileread","file read","read file","readfile"],
+		"body": [
+			"file_get_contents($1)$2"
+		],
+		"description": "Call the file_get_contents method"
+	},
+	"filewrite": {
+		"prefix": ["filewrite","file write","write file","writefile"],
+		"body": [
+			"file_put_contents($1)$2"
+		],
+		"description": "Call the file_put_contents method"
+	}
+
+
+
+
+}

@@ -1,0 +1,685 @@
+{
+	"name": "colemenutils",
+	"displayName": "ColemenUtils",
+	"description": "Useful utility commands.",
+	"publisher": "colemen",
+	"version": "0.0.1",
+	"engines": {
+		"vscode": "^1.66.0"
+	},
+	"categories": [
+		"Other"
+	],
+	"extensionKind": [
+		"ui",
+		"workspace"
+	],
+	"activationEvents": [
+		"*",
+		"onCommand:colemenutils.helloWorld"
+	],
+	"main": "./extension.js",
+	"contributes": {
+		"commands": [
+			{
+				"command": "colemenutils.defaultHashSelection",
+				"title": "Hash Selection"
+			},
+			{
+				"command": "colemenutils.md5HashSelection",
+				"title": "MD5 Hash Selection"
+			},
+			{
+				"command": "colemenutils.sha512HashSelection",
+				"title": "SHA512 Hash Selection"
+			},
+			{
+				"command": "colemenutils.sha1HashSelection",
+				"title": "SHA1 Hash Selection"
+			},
+			{
+				"command": "colemenutils.sha256HashSelection",
+				"title": "SHA256 Hash Selection"
+			},
+			{
+				"command": "colemenutils.base64EncodeDecode",
+				"title": "Base64 Encode/Decode Selection"
+			},
+			{
+				"command": "colemenutils.asciiBanner",
+				"title": "Convert Selection to ASCII Banner"
+			},
+			{
+				"command": "colemenutils.toggleBlockQuote",
+				"title": "Toggle Block Quote"
+			},
+			{
+				"command": "colemenutils.selectCurrentLine",
+				"title": "Select Current Line"
+			},
+			{
+				"command": "colemenutils.clearCurrentLine",
+				"title": "Clear Current Line"
+			},
+			{
+				"command": "colemenutils.reverseSlashesInWindowsPaths",
+				"title": "Reverse Windows Paths"
+			},
+			{
+				"command": "colemenutils.ComponentToMultiLine",
+				"title": "Format a component to multiline properties",
+				"category": "JSX"
+			},
+			{
+				"command": "colemenutils.FormatSVGContentCMD",
+				"title": "Format an SVG file to be less shitty",
+				"category": "SVG"
+			},
+			{
+				"command": "colemenutils.CaptureSVGViewboxValue",
+				"title": "Capture SVG Viewbox value.",
+				"category": "SVG"
+			},
+			{
+				"command": "colemenutils.addMarkdownHeader",
+				"title": "Add Markdown Header"
+			},
+			{
+				"command": "colemenutils.removeMarkdownHeader",
+				"title": "Remove Markdown Header"
+			},
+			{
+				"command": "colemenutils.CaptureSVGBody",
+				"title": "Capture SVG body value.",
+				"category": "SVG"
+			},
+			{
+				"command": "colemenutils.commentConsoleLogLines",
+				"title": "Comment console log calls .",
+				"category": "JS"
+			},
+			{
+				"command": "colemenutils.insertUUIDs",
+				"title": "Insert UUID"
+			},
+			{
+				"command": "colemenutils.LinesToStringArray",
+				"title": "Lines to Array of Strings"
+			},
+			{
+				"command": "colemenutils.LinesToFormattedArray",
+				"title": "Lines to Array of Typed Values"
+			},
+			{
+				"command": "colemenutils.LinesToImageTag",
+				"title": "Lines to image tag Array"
+			},
+			{
+				"command": "colemenutils.ImageTagsToLinesCMD",
+				"title": "Image tags to lines"
+			},
+			{
+				"command": "colemenutils.explodeByDelim",
+				"title": "Explode by Delimiter"
+			},
+			{
+				"command": "colemenutils.linesToArray",
+				"title": "Lines to Array without formatting"
+			},
+			{
+				"command": "colemenutils.stripEmptyLines",
+				"title": "Strip empty lines from the document"
+			},
+			{
+				"command": "colemenutils.toSingleLine",
+				"title": "Collapse to Single Line"
+			},
+			{
+				"command": "colemenutils.minifyFile",
+				"title": "Minify File"
+			},
+			{
+				"command": "colemenutils.stripTrailingSpaces",
+				"title": "Strip trailing spaces"
+			},
+			{
+				"command": "colemenutils.stripExcessiveSpaces",
+				"title": "Strip excessive spaces"
+			},
+			{
+				"command": "colemenutils.shuffleLines",
+				"title": "Shuffle Lines"
+			},
+			{
+				"command": "colemenutils.stripDuplicateLines",
+				"title": "Keep Unique"
+			},
+			{
+				"command": "colemenutils.stripSelectedDuplicate",
+				"title": "Keep Unique Selected"
+			},
+			{
+				"command": "colemenutils.sortLines",
+				"title": "Sort Alphabetically A-Z"
+			},
+			{
+				"command": "colemenutils.sortLinesReversed",
+				"title": "Sort Alphabetically Z-A (Reversed)"
+			},
+			{
+				"command": "colemenutils.sortByLength",
+				"title": "Sort By Length Small to Large"
+			},
+			{
+				"command": "colemenutils.sortByLengthReversed",
+				"title": "Sort By Length Large to Small (Reversed)"
+			},
+			{
+				"command": "colemenutils.applyNewLines",
+				"title": "Apply New Lines to File"
+			},
+			{
+				"command": "colemenutils.escapeAllSingleBackSlash",
+				"title": "Escape All Single Backslashes (\\)"
+			},
+			{
+				"command": "colemenutils.escapeSelectedSingleBackSlash",
+				"title": "Escape Selected Single Backslashes (\\)"
+			},
+			{
+				"command": "colemenutils.singleToDoubleQuote",
+				"title": "Single to Double quotes"
+			},
+			{
+				"command": "colemenutils.linesToListDelimiterUnique",
+				"title": "Lines to a delimited unique list",
+				"shortTitle": "Lines to Unique List",
+				"category": "Format"
+			},
+			{
+				"command": "colemenutils.linesToListDelimiter",
+				"title": "Lines to a delimited list",
+				"shortTitle": "Lines to List",
+				"category": "Format"
+			},
+			{
+				"command": "colemenutils.prepApricityComment",
+				"title": "JSON to apricity comment."
+			},
+			{
+				"command": "colemenutils.formatApricityComment",
+				"title": "Apricity Comment to JSON."
+			}
+		],
+		"snippets": [
+			{
+				"language": "markdown",
+				"path": "./md_snippets.json"
+			},
+			{
+				"language": "javascript",
+				"path": "./js_snippets.json"
+			},
+			{
+				"language": "typescriptreact",
+				"path": "./tsx_snippets.json"
+			},
+			{
+				"language": "php",
+				"path": "./php_snippets.json"
+			},
+			{
+				"language": "json",
+				"path": "./apricity_comment_snippets.json"
+			},
+			{
+				"language": "python",
+				"path": "./python_snippets.json"
+			},
+			{
+				"language": "python",
+				"path": "./python_colemenutils_snippets.json"
+			},
+			{
+				"language": "sql",
+				"path": "./sql_snippets.json"
+			}
+		],
+		"keybindings": [
+			{
+				"key": "ctrl+shift+b",
+				"command": "colemenutils.toggleBlockQuote",
+				"when": "editorLangId == 'markdown' && editorTextFocus"
+			},
+			{
+				"key": "ctrl+shift+delete",
+				"command": "colemenutils.clearCurrentLine",
+				"when": "editorTextFocus"
+			},
+			{
+				"key": "ctrl+b",
+				"command": "editor.action.insertSnippet",
+				"when": "editorLangId == 'markdown' && editorTextFocus",
+				"args": {
+					"snippet": "**${TM_SELECTED_TEXT:$0}**"
+				}
+			},
+			{
+				"key": "ctrl+i",
+				"command": "editor.action.insertSnippet",
+				"when": "editorLangId == 'markdown' && editorTextFocus",
+				"args": {
+					"snippet": "*${TM_SELECTED_TEXT:$0}*"
+				}
+			},
+			{
+				"key": "ctrl+up",
+				"command": "colemenutils.addMarkdownHeader",
+				"when": "editorLangId == 'markdown' && editorTextFocus"
+			},
+			{
+				"key": "ctrl+down",
+				"command": "colemenutils.removeMarkdownHeader",
+				"when": "editorLangId == 'markdown' && editorTextFocus"
+			},
+			{
+				"key": "alt+shift+i",
+				"command": "runCommands",
+				"args": {
+					"commands": [
+						"editor.action.selectHighlights",
+						"notebook.selectAllFindMatches"
+					]
+				}
+			},
+			{
+				"key": "ctrl+l",
+				"command": "colemenutils.selectCurrentLine",
+				"when": "editorTextFocus"
+			},
+			{
+				"key": "alt+shift+tab",
+				"command": "runCommands",
+				"args": {
+					"commands": [
+						"editor.action.previousSelectionMatchFindAction"
+					]
+				}
+			},
+			{
+				"key": "ctrl+tab",
+				"command": "runCommands",
+				"args": {
+					"commands": [
+						"editor.action.nextSelectionMatchFindAction"
+					]
+				}
+			},
+			{
+				"key": "ctrl+shift+down",
+				"command": "runCommands",
+				"args": {
+					"commands": [
+						"editor.action.moveLinesDownAction"
+					]
+				}
+			},
+			{
+				"key": "ctrl+shift+up",
+				"command": "runCommands",
+				"args": {
+					"commands": [
+						"editor.action.moveLinesUpAction"
+					]
+				}
+			},
+			{
+				"key": "alt+shift+u",
+				"command": "runCommands",
+				"args": {
+					"commands": [
+						"editor.action.transformToUppercase"
+					]
+				}
+			},
+			{
+				"key": "ctrl+u",
+				"command": "runCommands",
+				"args": {
+					"commands": [
+						"editor.action.transformToLowercase"
+					]
+				}
+			},
+			{
+				"key": "ctrl+q",
+				"command": "runCommands",
+				"args": {
+					"commands": [
+						"editor.action.commentLine"
+					]
+				}
+			},
+			{
+				"key": "alt+0",
+				"command": "runCommands",
+				"args": {
+					"commands": [
+						"editor.foldAll"
+					]
+				}
+			},
+			{
+				"key": "shift+alt+0",
+				"command": "runCommands",
+				"args": {
+					"commands": [
+						"editor.unfoldAll"
+					]
+				}
+			},
+			{
+				"key": "shift+alt+x",
+				"command": "colemenutils.insertBoxHeader",
+				"when": "editorTextFocus"
+			},
+			{
+				"key": "alt+x",
+				"command": "colemenutils.insertSingleLineHeader",
+				"when": "editorTextFocus"
+			},
+			{
+				"key": "ctrl+d",
+				"command": "runCommands",
+				"args": {
+					"commands": [
+						"editor.action.duplicateSelection"
+					]
+				}
+			}
+		],
+		"configuration": [
+			{
+			"title": "White Space Settings",
+			"properties": {
+				"colemenutils.highlightTrailingSpaces": {
+					"type": "boolean",
+					"default": true,
+					"description": "Highlight trailing spaces in the document."
+				},
+				"colemenutils.trailingSpacesHighlightColor": {
+					"type": "string",
+					"default": "rgba(255,0,0,0.3)",
+					"description": "Highlight color for trailing spaces (CSS color value)."
+				}
+			}},
+			{
+			"title": "Sorting Settings",
+			"properties": {
+				"colemenutils.ignoreSpecialCharactersCharacters": {
+					"type": "boolean",
+					"default": true,
+					"description": "Ignore non-alphanumeric characters when sorting.",
+					"markdownDescription": "Ignore non-alphanumeric characters when sorting alphabetically. It can act weirdly if this is set to false."
+				},
+
+				"colemenutils.numberPlacementAlphaSort": {
+					"type": "string",
+					"default": "before",
+					"enum": [
+						"before",
+						"after"
+					],
+					"enumDescriptions": [
+						"Numbers appear before letters.",
+						"Numbers appear after letters."
+					],
+					"description": "Place numeric values before or after alphabetic values when sorting.",	
+					"markdownDescription": "Place numeric values before or after alphabetic values when sorting."
+				},
+				"colemenutils.keepOriginalFormatting": {
+					"type": "boolean",
+					"default": false,
+					"description": "If true, the original formatting of the lines will be preserved when sorting.",
+					"markdownDescription": "If true, the original formatting of the lines will be preserved when sorting. Empty lines will maintain their original placement."
+				}
+
+			}},
+			{
+			"title": "General Settings",
+			"properties": {
+				"colemenutils.linesToListDelimiter": {
+					"type": "string",
+					"default": ",",
+					"description": "The delimiter to use when converting lines to a list.",
+					"markdownDescription": "The delimiter to use when converting lines to a list. This is used in the `linesToList` command."
+				},
+				"colemenutils.showSelectedLinesStatus": {
+					"type": "boolean",
+					"default": true,
+					"description": "Show the number of selected lines in the status bar."
+				},
+				"colemenutils.headerWidth": {
+					"type": "number",
+					"default": 80,
+					"description": "Width of the generated header block."
+				},
+				"colemenutils.defaultHashAlgo": {
+					"type": "string",
+					"default": "MD5",
+					"description": "The default hash algorithm to use for hashing. Options are: MD5, SHA1, SHA256, SHA512.",
+					"enum":[
+						"MD5",
+						"SHA1",
+						"SHA256",
+						"SHA512"
+					]
+				},
+				"colemenutils.bannerFont": {
+					"type": "string",
+					"default": "Banner",
+					"description": "Font to use for ASCII banners."
+				}
+			}}
+		],
+		"menus": {
+			"editor/context": [
+				{
+					"submenu": "colemenutils.contextFormatGeneralSubmenu",
+					"when": "editorTextFocus",
+					"group": "navigation"
+				},
+				{
+					"submenu": "colemenutils.contextFormatSVGSubmenu",
+					"when": "editorLangId == 'svg' && editorTextFocus",
+					"group": "navigation"
+				},
+				{
+					"submenu": "colemenutils.contextSortSubmenu",
+					"when": "editorTextFocus",
+					"group": "navigation"
+				},
+				{
+					"submenu": "colemenutils.contextHashSubmenu",
+					"when": "editorHasSelection",
+					"group": "navigation"
+				}
+			],
+			"colemenutils.contextSubmenu": [
+				{
+					"command": "colemenutils.insertUUIDs",
+					"group": "1_main"
+				},
+				{
+					"command": "colemenutils.stripTrailingSpaces",
+					"group": "2_whitespace"
+				}
+			],
+			"colemenutils.contextSortSubmenu": [
+				{
+					"command": "colemenutils.sortByLength",
+					"when": "editorHasSelection == false && editorTextFocus",
+					"group": "1_main"
+				},
+				{
+					"command": "colemenutils.sortByLengthReversed",
+					"when": "editorHasSelection == false && editorTextFocus",
+					"group": "1_main"
+				},
+				{
+					"command": "colemenutils.sortLines",
+					"when": "editorHasSelection == false && editorTextFocus",
+					"group": "1_main"
+				},
+				{
+					"command": "colemenutils.sortLinesReversed",
+					"when": "editorHasSelection == false && editorTextFocus",
+					"group": "1_main"
+				},
+				{
+					"command": "colemenutils.shuffleLines",
+					"when": "editorHasSelection == false && editorTextFocus",
+					"group": "1_main"
+				}
+			],
+			"colemenutils.contextHashSubmenu": [
+				{
+					"command": "colemenutils.md5HashSelection",
+					"group": "1_main"
+				},
+				{
+					"command": "colemenutils.sha512HashSelection",
+					"group": "1_main"
+				},
+				{
+					"command": "colemenutils.sha256HashSelection",
+					"group": "1_main"
+				},
+				{
+					"command": "colemenutils.sha1HashSelection",
+					"group": "1_main"
+				}
+			],
+			"colemenutils.contextFormatSVGSubmenu": [
+				{
+					"command": "colemenutils.FormatSVGContentCMD",
+					"group": "1_main"
+				},
+				{
+					"command": "colemenutils.CaptureSVGBody",
+					"group": "1_main"
+				},
+				{
+					"command": "colemenutils.CaptureSVGViewboxValue",
+					"group": "1_main"
+				}
+			],
+			"colemenutils.contextFormatGeneralSubmenu": [
+
+				{
+					"command": "colemenutils.linesToArray",
+					"group": "1_main"
+				},
+				{
+					"command": "colemenutils.LinesToStringArray",
+					"group": "1_main"
+				},
+				{
+					"command": "colemenutils.LinesToFormattedArray",
+					"group": "1_main"
+				},
+				{
+					"command": "colemenutils.linesToListDelimiter",
+					"group": "1_main"
+				},
+				{
+					"command": "colemenutils.linesToListDelimiterUnique",
+					"group": "1_main"
+				},
+				{
+					"command": "colemenutils.FormatSVGContentCMD",
+					"group": "1_svg",
+					"when": "editorLangId == 'xml' && editorTextFocus"
+				},
+				{
+					"command": "colemenutils.CaptureSVGBody",
+					"group": "1_svg",
+					"when": "editorLangId == 'xml' && editorTextFocus"
+				},
+				{
+					"command": "colemenutils.CaptureSVGViewboxValue",
+					"group": "1_svg",
+					"when": "editorLangId == 'xml' && editorTextFocus"
+				},
+
+				{
+					"command": "colemenutils.minifyFile",
+					"group": "1_minify"
+				},
+				{
+					"command": "colemenutils.toSingleLine",
+					"group": "1_minify"
+				},
+				{
+					"command": "colemenutils.stripDuplicateLines",
+					"group": "1_parse"
+				},
+				{
+					"command": "colemenutils.stripEmptyLines",
+					"group": "1_parse"
+				},
+				{
+					"command": "colemenutils.stripTrailingSpaces",
+					"group": "1_parse"
+				},
+				{
+					"command": "colemenutils.stripExcessiveSpaces",
+					"group": "1_parse"
+				}
+			]
+		},
+		"submenus": [
+			{
+				"id": "colemenutils.contextFormatGeneralSubmenu",
+				"label": "Format",
+				"icon": "$(tools)"
+			},
+			{
+				"id": "colemenutils.contextFormatSVGSubmenu",
+				"label": "SVG Format",
+				"icon": "$(tools)"
+			},
+			{
+				"id": "colemenutils.contextSortSubmenu",
+				"label": "Sort",
+				"icon": "$(tools)"
+			},
+			{
+				"id": "colemenutils.contextHashSubmenu",
+				"label": "Hash",
+				"icon": "☣"
+			}
+		]
+	},
+	"scripts": {
+		"lint": "eslint .",
+		"pretest": "npm run lint",
+		"publish": "vsce package"
+	},
+	"devDependencies": {
+		"@types/glob": "^7.2.0",
+		"@types/mocha": "^9.1.0",
+		"@types/node": "14.x",
+		"@types/vscode": "^1.66.0",
+		"@vscode/test-electron": "^2.1.3",
+		"eslint": "^8.11.0",
+		"glob": "^7.2.0",
+		"mocha": "^9.2.2",
+		"typescript": "^4.5.5"
+	},
+	"dependencies": {
+		"figlet": "^1.8.1",
+		"xml-js": "^1.6.11",
+		"xml-parser": "^1.2.1"
+	}
+}
