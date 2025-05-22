@@ -1,8 +1,133 @@
 # colemenutils README
 
-This is just a quick extension of various commands, snippets and keybindings that I find useful.
+This is simply an extension of various commands, snippets and keybindings that I find useful.
+
 
 ## Commands
+
+
+
+### Hashing & Encoding
+
+| Title                 | Description                                         | Command ID                        |
+| --------------------- | --------------------------------------------------- | --------------------------------- |
+| Hash Selection        | Hash selected text using the default algorithm. | colemenutils.defaultHashSelection |
+| MD5 Hash Selection    | Hash selected text using MD5.                   | colemenutils.md5HashSelection     |
+| SHA512 Hash Selection | Hash selected text using SHA512.                | colemenutils.sha512HashSelection  |
+| SHA1 Hash Selection   | Hash selected text using SHA1.                  | colemenutils.sha1HashSelection    |
+| SHA256 Hash Selection | Hash selected text using SHA256.                | colemenutils.sha256HashSelection  |
+| Base64 Encode/Decode  | Encode or decode the selected text as Base64.       | colemenutils.base64EncodeDecode   |
+
+---
+
+### SVG Utilities
+
+| Title                     | Description                                     | Command ID                          |
+| ------------------------- | ----------------------------------------------- | ----------------------------------- |
+| Format SVG Content        | Reformat SVG content for better readability.    | colemenutils.FormatSVGContentCMD    |
+| Capture SVG Viewbox Value | Extract the viewBox attribute from SVG content. | colemenutils.CaptureSVGViewboxValue |
+| Capture SVG Body Value    | Extract the body content from SVG.              | colemenutils.CaptureSVGBody         |
+
+---
+
+### Markdown & Text Formatting
+
+| Title                     | Description                                                      | Command ID                          |
+| ------------------------- | ---------------------------------------------------------------- | ----------------------------------- |
+| Toggle Block Quote        | Toggle block quote formatting for the selected lines (Markdown). | colemenutils.toggleBlockQuote       |
+| Add Markdown Header       | Add a Markdown header to the current line or selection.          | colemenutils.addMarkdownHeader      |
+| Remove Markdown Header    | Remove a Markdown header from the current line or selection.     | colemenutils.removeMarkdownHeader   |
+| Convert to ASCII Banner   | Convert the selected text to an ASCII art banner.                | colemenutils.asciiBanner            |
+| Insert Box Header         | Insert a box header.                                             | colemenutils.insertBoxHeader        |
+| Insert Single Line Header | Insert a single line header.                                     | colemenutils.insertSingleLineHeader |
+
+---
+
+### Line & Array Utilities
+
+| Title                                                        | Description                                                 | Command ID                              |
+| ------------------------------------------------------------ | ----------------------------------------------------------- | --------------------------------------- |
+| Lines to Array of Strings                                    | Convert each line to a quoted string in an array.           | colemenutils.LinesToStringArray         |
+| [Lines to Array of Typed Values](#linestoarrayoftypedvalues) | Convert each line to a typed value in an array.             | colemenutils.LinesToFormattedArray      |
+| Lines to Image Tag Array                                     | Convert each line to an image tag in an array.              | colemenutils.LinesToImageTag            |
+| Image Tags to Lines                                          | Convert image tag array back to lines.                      | colemenutils.ImageTagsToLinesCMD        |
+| Lines to Array (no formatting)                               | Convert lines to an array without quotes.                   | colemenutils.linesToArray               |
+| Lines to Unique Delimited List                               | Convert lines to a unique, delimited list.                  | colemenutils.linesToListDelimiterUnique |
+| Lines to Delimited List                                      | Convert lines to a delimited list.                          | colemenutils.linesToListDelimiter       |
+| [Explode by Delimiter](#ExplodeByDelimiter)                  | Split the selected text by a delimiter into multiple lines. | colemenutils.explodeByDelim             |
+
+---
+
+### Sorting & Shuffling
+
+| Title                              | Description                                     | Command ID                        |
+| ---------------------------------- | ----------------------------------------------- | --------------------------------- |
+| Sort Alphabetically A-Z            | Sort lines alphabetically (A-Z).                | colemenutils.sortLines            |
+| Sort Alphabetically Z-A (Reversed) | Sort lines alphabetically (Z-A).                | colemenutils.sortLinesReversed    |
+| Sort By Length Small to Large      | Sort lines by length (shortest to longest).     | colemenutils.sortByLength         |
+| Sort By Length Large to Small      | Sort lines by length (longest to shortest).     | colemenutils.sortByLengthReversed |
+| Shuffle Lines                      | Shuffle the lines in the document or selection. | colemenutils.shuffleLines         |
+
+---
+
+### Whitespace & Cleanup
+
+| Title                                         | Description                                       | Command ID                          |
+| --------------------------------- | ------------------------------------------------- | ----------------------------------- |
+| [Strip Empty Lines](#stripEmptyLines)         | Remove all empty lines from the document.         | colemenutils.stripEmptyLines        |
+| [Strip Trailing Spaces](#striptrailingspaces) | Remove trailing spaces from each line.            | colemenutils.stripTrailingSpaces    |
+| Strip Excessive Spaces     | Replace multiple spaces with a single space.      | colemenutils.stripExcessiveSpaces   |
+| Keep Unique                | Remove duplicate lines, keeping only unique ones. | colemenutils.stripDuplicateLines    |
+| Keep Unique Selected       | Remove duplicate lines from the selection.        | colemenutils.stripSelectedDuplicate |
+
+---
+
+### Selection & Line Editing
+
+| Title                         | Description                                                     | Command ID                                |
+| ----------------------------- | --------------------------------------------------------------- | ----------------------------------------- |
+| Select Current Line           | Select the entire current line(s).                              | colemenutils.selectCurrentLine            |
+| Clear Current Line            | Clear the content of the current line(s).                       | colemenutils.clearCurrentLine             |
+| Format Component to Multiline | Format a JSX component to have each property on its own line.   | colemenutils.ComponentToMultiLine         |
+| Reverse Windows Paths         | Replace forward slashes with backslashes in Windows file paths. | colemenutils.reverseSlashesInWindowsPaths |
+| Apply New Lines to File       | Insert new lines into the file at specified positions.          | colemenutils.applyNewLines                |
+| Collapse to Single Line       | Collapse the selection or document to a single line.            | colemenutils.toSingleLine                 |
+| Minify File                   | Minify the current file content.                                | colemenutils.minifyFile                   |
+
+---
+
+### Quoting & Escaping
+
+| Title                                  | Description                                                 | Command ID                                 |
+| -------------------------------------- | ----------------------------------------------------------- | ------------------------------------------ |
+| Escape All Single Backslashes (\)      | Escape all single backslashes in the selection or document. | colemenutils.escapeAllSingleBackSlash      |
+| Escape Selected Single Backslashes (\) | Escape single backslashes in the selection.                 | colemenutils.escapeSelectedSingleBackSlash |
+| Single to Double Quotes                | Convert single quotes to double quotes in the selection.    | colemenutils.singleToDoubleQuote           |
+
+---
+
+### Other Utilities
+
+| Title                      | Description                                          | Command ID                          |
+| -------------------------- | ---------------------------------------------------- | ----------------------------------- |
+| Comment Console Log Calls  | Comment out all `console.log` calls in the document. | colemenutils.commentConsoleLogLines |
+| [Insert UUID](#InsertUUID) | Insert a new UUID at the cursor position.            | colemenutils.insertUUIDs            |
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ### Line Sorting
 You can sort the lines of a file using commands or the context menu
@@ -12,7 +137,7 @@ You can sort the lines of a file using commands or the context menu
 - Sort Alphabetically Z-A
 - Sort by length large to small
 - Sort by length small to large
-![alt text](20250521183528.gif)
+
 
 
 By Default it will keep the formatting of spaces in the document, you can shut that off if you want. 
@@ -21,6 +146,7 @@ Numbers are also sorted, you can specify if they should be before or after the a
 
 
 ---
+
 
 ### Lines to Array of Strings
 This will convert each line of the file into an indice of an array and wrap each element in quotes.
@@ -36,7 +162,7 @@ This will convert each line of the file into an indice of an array without addin
 Very similar to **Lines to Array without formatting** except this will keep only unique lines and create a list from them.
 
 
-### Insert UUID
+### Insert UUID {#InsertUUID}
 Generate a random UUID for every cursor.
 
 ![alt text](20250521181319.gif)
@@ -65,7 +191,7 @@ Replace all single backslashes '\\' in the file with a double backslash '\\\\'
 ---
 
 
-### Lines to Array of Typed Values
+### Lines to Array of Typed Values {#linestoarrayoftypedvalues}
 
 Take each line of the file and concatenate them into a square bracketed array.
 
@@ -75,7 +201,7 @@ This will wrap strings in quotes and keep numbers and booleans as they were.
 
 ---
 
-### Explode by Delimiter
+### Explode by Delimiter {#ExplodeByDelimiter}
 Finds the most commonly occuring non-alphanumeric character and splits the file by it.
 
 It ignores spaces, newlines, carriage returns, double and single quotes.
@@ -103,7 +229,7 @@ Replace all single Qutoes `'` with double quotes `"` in the file.
 
 
 
-### Strip empty lines from the document
+### Strip empty lines from the document {#stripEmptyLines}
 Remove all empty lines from the file.
 
 ![alt text](20250521185004.gif)
@@ -111,7 +237,7 @@ Remove all empty lines from the file.
 
 ---
 
-### Strip & Highlight Trailing Spaces
+### Strip & Highlight Trailing Spaces {#striptrailingspaces}
 
 ![alt text](20250521184552.gif)
 
@@ -171,165 +297,91 @@ This will locate the body of an SVG and copy it to the clipboard.
 
 
 
-### **Sorting**
----
-
-`Sort All Lines Alphabetically A-Z`\
-Sort every line in the file alphabetically from a to z.
-
-Sort Selected Lines A-Z`\
-Sort the selected lines in alphabetical order from a to z.
-
----
-``
-
-`Sort Selected Lines Alphabetically Z-A (Reversed)`\
-Sort the selected lines in reverse alphabetical order from z to a.
-
-
-`Sort All Lines Alphabetically Z-A (Reversed)`\
-Sort every line in the file in reverse alphabetical order from z to a.
-
----
-
-`Sort All Lines By Length Large to Small`\
-Sort every line in the file by length from largest to smallest.
-
-`Sort Selected Lines By Length Large to Small`\
-Sort selected lines by length from largest to smallest.
-
----
-
-`Sort All Lines By Length Small to Large`\
-Sort every line in the file by length from smallest to largest.
-
-`Sort Selected Lines By Length Small to Large`\
-Sort selected lines by length from smallest to largest.
-
----
-
-
 
 ## Keybindings
 
-### General Keybindings
+Below are the default keybindings provided by this extension. You can customize these in your VS Code keybindings settings.
 
-- **Ctrl+Shift+Delete** – Remove all content from the current line, but keep the line and cursor position unchanged.
-- **Ctrl+D** – Duplicate the current selection or line.
-- **Ctrl+Q** – Toggle line comment on the current line or selection.
-- **Ctrl+L** – Expand the selection to the entire line.
-- **Alt+Shift+I** – Select all occurrences of the current selection in the editor and, if in a notebook, select all find matches as well.
-- **Alt+Shift+Tab** – Move to the previous selection match.
-- **Ctrl+Tab** – Move to the next selection match.
-
-
-- **Alt+Shift+U** – Transform the selected text to uppercase.
-- **Ctrl+U** – Transform the selected text to lowercase.
-
-- **Alt+0** – Fold all regions in the editor.
-- **Shift+Alt+0** – Unfold all regions in the editor.
 
 ### Markdown Keybindings
 
-- **Ctrl+B** – Wrap the selected text in `**` to make it bold. If no text is selected, inserts `****` and places the cursor in the middle.
-- **Ctrl+I** – Wrap the selected text in `*` to make it italic. If no text is selected, inserts `**` and places the cursor in the middle.
-- **Ctrl+Up** – Add a `#` to the beginning of the current line (Markdown header).
-- **Ctrl+Down** – Remove a `#` from the beginning of the current line (Markdown header).
-
-**Ctrl+Shift+B** – Toggles a Markdown block quote (`> `) at the start of each selected line.  
-If a line already starts with `> `, it removes one level of block quote (supports nested block quotes).  
-If not, it adds `> ` at the start. Works with multiple lines and selections.
-
-### Line Manipulation
-
-- **Ctrl+Shift+Up** – Move the current line or selection up.
-- **Ctrl+Shift+Down** – Move the current line or selection down.
+| Keybinding   | Description                         | When                   | Command ID                        |
+| ------------ | ----------------------------------- | ---------------------- | --------------------------------- |
+| Ctrl+Shift+B | Toggle block quote in Markdown      | Markdown, editor focus | colemenutils.toggleBlockQuote     |
+| Ctrl+B       | Bold selected text in Markdown      | Markdown, editor focus | editor.action.insertSnippet       |
+| Ctrl+I       | Italicize selected text in Markdown | Markdown, editor focus | editor.action.insertSnippet       |
+| Ctrl+Up      | Add Markdown header                 | Markdown, editor focus | colemenutils.addMarkdownHeader    |
+| Ctrl+Down    | Remove Markdown header              | Markdown, editor focus | colemenutils.removeMarkdownHeader |
 
 
 
-
-
-
-
-
-
-
-
-
-## Keybindings
-
-
-### General Keybindings
-
-
-### [General] Clear Current Line
-**control+Shift+Delete** – Remove all content from the current line, but keep the line and cursor position unchanged.
-
-### [General] Select All Highlights
-**alt+shift+i** – Selects all occurrences of the current selection in the editor and, if in a notebook, selects all find matches as well.
+| Keybinding        | Description                                | When         | Command ID                                |
+| ----------------- | ------------------------------------------ | ------------ | ----------------------------------------- |
+| Ctrl+Shift+Delete | Clear the current line                     | Editor focus | colemenutils.clearCurrentLine             |
+| Alt+Shift+I       | Select all highlights and notebook matches | Any          | runCommands (select highlights, notebook) |
+| Ctrl+L            | Select the current line                    | Editor focus | colemenutils.selectCurrentLine            |
+| Alt+Shift+Tab     | Previous selection match                   | Any          | runCommands (previous selection match)    |
+| Ctrl+Tab          | Next selection match                       | Any          | runCommands (next selection match)        |
+| Ctrl+Shift+Down   | Move lines down                            | Any          | runCommands (move lines down)             |
+| Ctrl+Shift+Up     | Move lines up                              | Any          | runCommands (move lines up)               |
+| Alt+Shift+U       | Transform selection to uppercase           | Any          | runCommands (transform to uppercase)      |
+| Ctrl+U            | Transform selection to lowercase           | Any          | runCommands (transform to lowercase)      |
+| Ctrl+Q            | Comment/uncomment current line             | Any          | runCommands (comment line)                |
+| Alt+0             | Fold all code regions                      | Any          | runCommands (fold all)                    |
+| Shift+Alt+0       | Unfold all code regions                    | Any          | runCommands (unfold all)                  |
+| Shift+Alt+X       | Insert a box header                        | Editor focus | colemenutils.insertBoxHeader              |
+| Alt+X             | Insert a single line header                | Editor focus | colemenutils.insertSingleLineHeader       |
+| Ctrl+D            | Duplicate the current selection            | Any          | runCommands (duplicate selection)         |
 
 
 
 
 
----
-
-### Markdown Keybindings
-
-### [MD] Add Header
-**control+up** - Add a `#` to the beginning of the current line
-
----
-
-### [MD] Remove Header
-**control+down** - Remove a `#` from beginning of the current line
-
----
-
-### [MD] Bold
-**control+b** - Wrap the selected text in `**` to make it bold.
-
----
-
-### [MD] Italic
-**control+i** - Wrap the selected text in `*` to make it bold.
 
 
 
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
-
-For example if there is an image subfolder under your extension project workspace:
-
-
-
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
-
-## Requirements
-
-This extension does not have any requirements or dependencies.
-
----
-
-## Extension Settings
-
-This extension currently does not have any settings.
-
----
-
-## Known Issues
-
-Nope
-
----
-
-## Release Notes
-
-This is the first release of the extension.
 
 
 
 
-##
-To compile a package to the vsix use the command : vsce package
-to install the vsix : 
+## Configuration
+
+You can customize the behavior of ColemenUtils through the following settings in your VS Code `settings.json` or the Settings UI.
+
+### White Space Settings
+
+| Setting                                      | Type    | Default           | Description                                                        |
+|-----------------------------------------------|---------|-------------------|--------------------------------------------------------------------|
+| `colemenutils.highlightTrailingSpaces`        | boolean | `true`            | Highlight trailing spaces in the document.                         |
+| `colemenutils.trailingSpacesHighlightColor`   | string  | `rgba(255,0,0,0.3)` | Highlight color for trailing spaces (CSS color value).             |
+
+### Sorting Settings
+
+| Setting                                         | Type    | Default   | Description                                                                                 |
+|--------------------------------------------------|---------|-----------|---------------------------------------------------------------------------------------------|
+| `colemenutils.ignoreSpecialCharactersCharacters` | boolean | `true`    | Ignore non-alphanumeric characters when sorting alphabetically.                              |
+| `colemenutils.numberPlacementAlphaSort`          | string  | `before`  | Place numeric values before or after alphabetic values when sorting. (`before` or `after`)   |
+| `colemenutils.keepOriginalFormatting`            | boolean | `false`   | If true, the original formatting of the lines will be preserved when sorting.                |
+
+### General Settings
+
+| Setting                                 | Type    | Default   | Description                                                                                 |
+|------------------------------------------|---------|-----------|---------------------------------------------------------------------------------------------|
+| `colemenutils.linesToListDelimiter`      | string  | `,`       | The delimiter to use when converting lines to a list. Used in the `linesToList` command.     |
+| `colemenutils.showSelectedLinesStatus`   | boolean | `true`    | Show the number of selected lines in the status bar.                                        |
+| `colemenutils.headerWidth`               | number  | `80`      | Width of the generated header block.                                                        |
+| `colemenutils.defaultHashAlgo`           | string  | `MD5`     | The default hash algorithm to use for hashing. Options: `MD5`, `SHA1`, `SHA256`, `SHA512`.  |
+| `colemenutils.bannerFont`                | string  | `Banner`  | Font to use for ASCII banners.                                                              |
+
+
+
+
+
+
+
+
+
+
+
+
