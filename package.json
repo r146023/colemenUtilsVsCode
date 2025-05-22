@@ -4,6 +4,9 @@
 	"description": "Useful utility commands.",
 	"publisher": "colemen",
 	"version": "0.0.1",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/r146023/colemenUtilsVsCode.git"},
 	"engines": {
 		"vscode": "^1.66.0"
 	},
@@ -23,7 +26,10 @@
 		"commands": [
 			{
 				"command": "colemenutils.defaultHashSelection",
-				"title": "Hash Selection"
+				"title": "Hash Selection",
+				"category": "Hash",
+				"shortTitle": "Hash Selection",
+				"enablement": "editorHasSelection"
 			},
 			{
 				"command": "colemenutils.md5HashSelection",
@@ -203,12 +209,11 @@
 				"category": "Format"
 			},
 			{
-				"command": "colemenutils.prepApricityComment",
-				"title": "JSON to apricity comment."
-			},
-			{
-				"command": "colemenutils.formatApricityComment",
-				"title": "Apricity Comment to JSON."
+				"command": "colemenutils.reformatMarkdownTables",
+				"title": "Format Tables",
+				"shortTitle": "Format Tables",
+				"enablement": "editorLangId == 'markdown'",
+				"category": "Markdown"
 			}
 		],
 		"snippets": [
@@ -454,6 +459,24 @@
 					"description": "The delimiter to use when converting lines to a list.",
 					"markdownDescription": "The delimiter to use when converting lines to a list. This is used in the `linesToList` command."
 				},
+				"colemenutils.toArrayQuoteCharacter": {
+					"type": "string",
+					"default": "'",
+					"enum": [
+						"\"",
+						"'"
+					],
+					"enumDescriptions": [
+						"Single quotes",
+						"Double quotes"
+					],
+
+					"description": "The quote character to use when converting lines to an array.",
+					"markdownDescription": "The quote character to use when converting lines to an array. This is used in the `linesToArray` command.",
+					"tags": ["ColemenUtils","Array", "Quote", "Character"],
+					"title": "Array Quote Character"
+
+				},
 				"colemenutils.showSelectedLinesStatus": {
 					"type": "boolean",
 					"default": true,
@@ -610,6 +633,11 @@
 					"command": "colemenutils.CaptureSVGViewboxValue",
 					"group": "1_svg",
 					"when": "editorLangId == 'xml' && editorTextFocus"
+				},
+				{
+					"command": "colemenutils.reformatMarkdownTables",
+					"group": "1_markdown",
+					"when": "editorLangId == 'markdown' && editorTextFocus"
 				},
 
 				{
