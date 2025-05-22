@@ -22,6 +22,11 @@ function activate(context) {
 
 
 
+
+
+
+
+
 	//  #     #    #     #####  #     # ### #     #  #####
 	//  #     #   # #   #     # #     #  #  ##    # #     #
 	//  #     #  #   #  #       #     #  #  # #   # #
@@ -175,6 +180,18 @@ function activate(context) {
 	context.subscriptions.push(asciiBannerCMD);
 
 
+
+
+
+	//  ######  ### #     # ### ######  ####### ######
+	//  #     #  #  #     #  #  #     # #       #     #
+	//  #     #  #  #     #  #  #     # #       #     #
+	//  #     #  #  #     #  #  #     # #####   ######
+	//  #     #  #   #   #   #  #     # #       #   #
+	//  #     #  #    # #    #  #     # #       #    #
+	//  ######  ###    #    ### ######  ####### #     #
+
+
 	let insertBoxHeaderCMD = vscode.commands.registerCommand('colemenutils.insertBoxHeader', async function () {
 		const editor = vscode.window.activeTextEditor;
 		if (!editor) return;
@@ -294,6 +311,11 @@ function activate(context) {
 	});
 	context.subscriptions.push(insertUUIDsCMD);
 
+
+
+
+
+
 	// Insert a new line above the current line
 	let clearCurrentLineCMD = vscode.commands.registerCommand('colemenutils.clearCurrentLine', function () {
 		const editor = vscode.window.activeTextEditor;
@@ -321,6 +343,21 @@ function activate(context) {
 	});
 	context.subscriptions.push(selectCurrentLineCMD);
 
+
+
+
+
+
+
+
+
+	//  #     #    #    ######  #    # ######  ####### #     # #     #
+	//  ##   ##   # #   #     # #   #  #     # #     # #  #  # ##    #
+	//  # # # #  #   #  #     # #  #   #     # #     # #  #  # # #   #
+	//  #  #  # #     # ######  ###    #     # #     # #  #  # #  #  #
+	//  #     # ####### #   #   #  #   #     # #     # #  #  # #   # #
+	//  #     # #     # #    #  #   #  #     # #     # #  #  # #    ##
+	//  #     # #     # #     # #    # ######  #######  ## ##  #     #
 
 
 	// Toggle a markdown block quote on the selected lines
@@ -394,6 +431,97 @@ function activate(context) {
 	});
 	context.subscriptions.push(removeMarkdownHeader);
 
+	let reformatMarkdownTablesCMD = vscode.commands.registerCommand('colemenutils.reformatMarkdownTables', async function () {
+		const editor = vscode.window.activeTextEditor;
+		if (!editor || editor.document.languageId !== 'markdown') {
+			vscode.window.showInformationMessage('This command only works in Markdown files.');
+			return;
+		}
+		const doc = editor.document;
+		const text = doc.getText();
+		const lines = text.split('\n');
+		let inTable = false;
+		let tableStart = 0;
+		let tableLines = [];
+		let edits = [];
+
+		function formatTable(tableLines) {
+			// Split each line into cells
+			let rows = tableLines.map(line =>
+				line.trim().replace(/^\||\|$/g, '').split('|').map(cell => cell.trim())
+			);
+			// Find max width for each column
+			let colCount = Math.max(...rows.map(row => row.length));
+			let colWidths = Array(colCount).fill(0);
+			rows.forEach(row => {
+				row.forEach((cell, i) => {
+					colWidths[i] = Math.max(colWidths[i], cell.length);
+				});
+			});
+			// Pad cells and reconstruct lines
+			return rows.map((row, rowIdx) => {
+				let padded = row.map((cell, i) => {
+					let pad = colWidths[i] - cell.length;
+					let left = cell;
+					let right = ' '.repeat(pad);
+					// For separator row, keep dashes
+					if (rowIdx === 1 && /^-+$/.test(cell.replace(/:/g, ''))) {
+						left = cell.replace(/-+/g, '-'.repeat(colWidths[i]));
+						right = '';
+					}
+					return left + right;
+				});
+				return '| ' + padded.join(' | ') + ' |';
+			});
+		}
+
+		for (let i = 0; i < lines.length; i++) {
+			const line = lines[i];
+			// Detect table: at least one | and a separator row (---)
+			if (/\|/.test(line)) {
+				if (!inTable) {
+					inTable = true;
+					tableStart = i;
+					tableLines = [];
+				}
+				tableLines.push(line);
+			} else if (inTable) {
+				// End of table
+				if (tableLines.length >= 2 && /-+/.test(tableLines[1])) {
+					const formatted = formatTable(tableLines);
+					edits.push({ start: tableStart, end: tableStart + tableLines.length, lines: formatted });
+				}
+				inTable = false;
+				tableLines = [];
+			}
+		}
+		// Handle table at end of file
+		if (inTable && tableLines.length >= 2 && /-+/.test(tableLines[1])) {
+			const formatted = formatTable(tableLines);
+			edits.push({ start: tableStart, end: tableStart + tableLines.length, lines: formatted });
+		}
+
+		if (edits.length === 0) {
+			vscode.window.showInformationMessage('No Markdown tables found to reformat.');
+			return;
+		}
+
+		await editor.edit(editBuilder => {
+			for (let i = edits.length - 1; i >= 0; i--) {
+				const { start, end, lines } = edits[i];
+				const range = new vscode.Range(start, 0, end, 0);
+				editBuilder.replace(range, lines.join('\n'));
+			}
+		});
+		// vscode.window.showInformationMessage('Markdown tables reformatted!');
+	});
+	context.subscriptions.push(reformatMarkdownTablesCMD);
+
+
+
+
+
+
 
 
 	let ReverseSlashesInWindowsPathsCMD = vscode.commands.registerCommand('colemenutils.reverseSlashesInWindowsPaths', function () {
@@ -424,6 +552,17 @@ function activate(context) {
 		}
 	});
 	context.subscriptions.push(ReverseSlashesInWindowsPathsCMD);
+
+
+
+	//     #    ######  ######     #    #     #
+	//    # #   #     # #     #   # #    #   #
+	//   #   #  #     # #     #  #   #    # #
+	//  #     # ######  ######  #     #    #
+	//  ####### #   #   #   #   #######    #
+	//  #     # #    #  #    #  #     #    #
+	//  #     # #     # #     # #     #    #
+
 
 	let LinesToStringArrayCMD = vscode.commands.registerCommand('colemenutils.LinesToStringArray', function () {
 		const editor = vscode.window.activeTextEditor;
@@ -470,7 +609,6 @@ function activate(context) {
 	});
 	context.subscriptions.push(LinesToStringArrayCMD);
 
-
 	let LinesToFormattedArrayCMD = vscode.commands.registerCommand('colemenutils.LinesToFormattedArray', function () {
 		const editor = vscode.window.activeTextEditor;
 		if (!editor) return;
@@ -503,7 +641,7 @@ function activate(context) {
 					return;
 				}
 
-				indices.push(`"${element}"`);
+				indices.push(`${config.get("toArrayQuoteCharacter")}${element}${config.get("toArrayQuoteCharacter")}`);
 			}
 		});
 
@@ -515,6 +653,37 @@ function activate(context) {
 
 	});
 	context.subscriptions.push(LinesToFormattedArrayCMD);
+
+	let LinesToArrayCMD = vscode.commands.registerCommand('colemenutils.linesToArray', function () {
+		const editor = vscode.window.activeTextEditor;
+		if(editor){
+			let document = editor.document;
+			const documentText = document.getText();
+
+			// let ColemenUtils = vscode.window.createOutputChannel("ColemenUtils");
+			const result = documentText.split(/\r?\n/);
+			var indices = [];
+			result.forEach((element) => {
+				if(element.length > 0){
+					indices.push(`${element}`);
+				}
+			});
+
+			let range = new vscode.Range(0, 0, editor.document.lineCount, 0);
+			var output_string = `[${indices.join(',')}]`;
+
+			const workEdits = new vscode.WorkspaceEdit();
+			workEdits.set(document.uri, [vscode.TextEdit.replace(range,output_string)]); // give the edits
+			vscode.workspace.applyEdit(workEdits)
+			// ColemenUtils.appendLine(`Converting new lines to an array without formatting.`);
+		}
+	});
+	context.subscriptions.push(LinesToArrayCMD);
+
+
+
+
+
 
 
 
@@ -622,6 +791,10 @@ function activate(context) {
 		}
 	});
 	context.subscriptions.push(explodeByDelimCMD);
+
+
+
+
 
 
 	//   #####  #     #  #####
@@ -909,33 +1082,6 @@ function activate(context) {
 	context.subscriptions.push(CommentConsoleLogLinesCMD);
 
 
-
-	let LinesToArrayCMD = vscode.commands.registerCommand('colemenutils.linesToArray', function () {
-		const editor = vscode.window.activeTextEditor;
-		if(editor){
-			let document = editor.document;
-			const documentText = document.getText();
-
-			// let ColemenUtils = vscode.window.createOutputChannel("ColemenUtils");
-			const result = documentText.split(/\r?\n/);
-			var indices = [];
-			result.forEach((element) => {
-				if(element.length > 0){
-					indices.push(`${element}`);
-				}
-			});
-
-			let range = new vscode.Range(0, 0, editor.document.lineCount, 0);
-			var output_string = `[${indices.join(',')}]`;
-
-			const workEdits = new vscode.WorkspaceEdit();
-			workEdits.set(document.uri, [vscode.TextEdit.replace(range,output_string)]); // give the edits
-			vscode.workspace.applyEdit(workEdits)
-			// ColemenUtils.appendLine(`Converting new lines to an array without formatting.`);
-		}
-	});
-	context.subscriptions.push(LinesToArrayCMD);
-
 	let StripEmptyLines = vscode.commands.registerCommand('colemenutils.stripEmptyLines', function () {
 		const editor = vscode.window.activeTextEditor;
 		if(editor){
@@ -963,6 +1109,33 @@ function activate(context) {
 	});
 	context.subscriptions.push(StripEmptyLines);
 
+
+
+	//  #     # ### #     # ### ####### #     #
+	//  ##   ##  #  ##    #  #  #        #   #
+	//  # # # #  #  # #   #  #  #         # #
+	//  #  #  #  #  #  #  #  #  #####      #
+	//  #     #  #  #   # #  #  #          #
+	//  #     #  #  #    ##  #  #          #
+	//  #     # ### #     # ### #          #
+
+	/**
+	 * Collapses all lines in the current document into a single line by removing all line breaks.
+	 *
+	 * - Only non-empty lines are included in the result.
+	 * - Useful for converting multi-line text or code into a single continuous line.
+	 * - Operates on the entire document, not just the selection.
+	 *
+	 * **Command:** `colemenutils.toSingleLine`
+	 *
+	 * @command colemenutils.toSingleLine
+	 * @description Collapses all lines in the document into a single line (removes all line breaks).
+	 * @example
+	 * // To use:
+	 * // 1. Open the document you want to collapse.
+	 * // 2. Run the "Collapse to Single Line" command from the Command Palette.
+	 * // 3. All lines will be joined into a single line.
+	 */
 	let ToSingleLine = vscode.commands.registerCommand('colemenutils.toSingleLine', function () {
 		const editor = vscode.window.activeTextEditor;
 		if(editor){
@@ -990,6 +1163,23 @@ function activate(context) {
 	});
 	context.subscriptions.push(ToSingleLine);
 
+	/**
+	 * Minifies the current file by removing excessive whitespace from each line and joining the result.
+	 *
+	 * - Each line is processed to replace multiple consecutive spaces/tabs with a single space.
+	 * - All lines are then joined together into a single string, removing line breaks.
+	 * - Useful for compressing code or data files for compact storage or transfer.
+	 *
+	 * **Command:** `colemenutils.minifyFile`
+	 *
+	 * @command colemenutils.minifyFile
+	 * @description Minifies the file by stripping excessive whitespace and joining all lines.
+	 * @example
+	 * // To use:
+	 * // 1. Open the file you want to minify.
+	 * // 2. Run the "Minify File" command from the Command Palette.
+	 * // 3. The file will be replaced with a minified version (single line, minimal spaces).
+	 */
 	let MinifyFile = vscode.commands.registerCommand('colemenutils.minifyFile', function () {
 		const editor = vscode.window.activeTextEditor;
 		if(editor){
@@ -1023,7 +1213,23 @@ function activate(context) {
 	//   #####  #       #     #  #####  #######  #####
 
 
-
+	/**
+	 * Removes trailing spaces and tabs from the end of each line in the document.
+	 *
+	 * - Processes the entire document, not just the selection.
+	 * - Useful for cleaning up files before committing or sharing code.
+	 * - Does not affect spaces or tabs within lines, only at the end.
+	 *
+	 * **Command:** `colemenutils.stripTrailingSpaces`
+	 *
+	 * @command colemenutils.stripTrailingSpaces
+	 * @description Removes trailing spaces and tabs from each line in the document.
+	 * @example
+	 * // To use:
+	 * // 1. Open the document you want to clean up.
+	 * // 2. Run the "Strip Trailing Spaces" command from the Command Palette.
+	 * // 3. All trailing spaces and tabs at the end of lines will be removed.
+	 */
 	let StripTrailingSpacesCMD = vscode.commands.registerCommand('colemenutils.stripTrailingSpaces', function () {
 		const editor = vscode.window.activeTextEditor;
 		if (editor) {
@@ -1039,7 +1245,23 @@ function activate(context) {
 	});
 	context.subscriptions.push(StripTrailingSpacesCMD);
 
-	// Replace occurences of multiple spaces with a single space
+	/**
+	 * Replaces occurrences of multiple consecutive spaces or tabs with a single space.
+	 *
+	 * - If there is a selection, only the selected text is affected; otherwise, the entire document is processed.
+	 * - Useful for cleaning up formatting by reducing excessive whitespace.
+	 * - Does not affect line breaks.
+	 *
+	 * **Command:** `colemenutils.stripExcessiveSpaces`
+	 *
+	 * @command colemenutils.stripExcessiveSpaces
+	 * @description Replaces multiple spaces/tabs with a single space in the selection or document.
+	 * @example
+	 * // To use:
+	 * // 1. Select the text you want to clean up, or leave the selection empty to process the whole file.
+	 * // 2. Run the "Strip Excessive Spaces" command from the Command Palette.
+	 * // 3. All consecutive spaces/tabs will be replaced with a single space.
+	 */
 	let StripExcessiveSpacesCMD = vscode.commands.registerCommand('colemenutils.stripExcessiveSpaces', function () {
 		const editor = vscode.window.activeTextEditor;
 		if (!editor) return;
@@ -1068,43 +1290,24 @@ function activate(context) {
 	context.subscriptions.push(StripExcessiveSpacesCMD);
 
 
-	// let StripTrailingSpaces = vscode.commands.registerCommand('colemenutils.stripTrailingSpaces', function () {
-	// 	const editor = vscode.window.activeTextEditor;
-	// 	if(editor){
-	// 		let document = editor.document;
-	// 		const documentText = document.getText();
-	// 		var output_string = documentText.replace(/\s+[^\S\r\n]$/gm,'')
 
-	// 		const workEdits = new vscode.WorkspaceEdit();
-	// 		let range = new vscode.Range(0, 0, editor.document.lineCount, 0);
-	// 		workEdits.set(document.uri, [vscode.TextEdit.replace(range,output_string)]); // give the edits
-	// 		vscode.workspace.applyEdit(workEdits)
-	// 	}
-	// });
-	// context.subscriptions.push(StripTrailingSpaces);
-
-	let shuffleLinesCMD = vscode.commands.registerCommand('colemenutils.shuffleLines', function () {
-		const editor = vscode.window.activeTextEditor;
-		if (editor) {
-			const document = editor.document;
-			const lines = [];
-			for (let i = 0; i < document.lineCount; i++) {
-				lines.push(document.lineAt(i).text);
-			}
-			// Fisher-Yates shuffle
-			for (let i = lines.length - 1; i > 0; i--) {
-				const j = Math.floor(Math.random() * (i + 1));
-				[lines[i], lines[j]] = [lines[j], lines[i]];
-			}
-			const output_string = lines.join('\n');
-			const workEdits = new vscode.WorkspaceEdit();
-			let range = new vscode.Range(0, 0, document.lineCount, 0);
-			workEdits.set(document.uri, [vscode.TextEdit.replace(range, output_string)]);
-			vscode.workspace.applyEdit(workEdits);
-		}
-	});
-	context.subscriptions.push(shuffleLinesCMD);
-
+	/**
+	 * Removes duplicate lines from the entire document, keeping only unique lines.
+	 *
+	 * - Only the first occurrence of each unique line is preserved; all subsequent duplicates are removed.
+	 * - The order of the first occurrence of each unique line is maintained.
+	 * - Useful for quickly deduplicating lists or blocks of text in the whole file.
+	 *
+	 * **Command:** `colemenutils.stripDuplicateLines`
+	 *
+	 * @command colemenutils.stripDuplicateLines
+	 * @description Removes duplicate lines from the document, keeping only unique lines.
+	 * @example
+	 * // To use:
+	 * // 1. Open the document you want to deduplicate.
+	 * // 2. Run the "Keep Unique" command from the Command Palette.
+	 * // 3. Only the first occurrence of each line in the document will remain.
+	 */
 	let StripDuplicateLines = vscode.commands.registerCommand('colemenutils.stripDuplicateLines', function () {
 		const editor = vscode.window.activeTextEditor;
 		if(editor){
@@ -1150,81 +1353,82 @@ function activate(context) {
 	});
 	context.subscriptions.push(StripSelectedDuplicate);
 
-	// let SortSelected = vscode.commands.registerCommand('colemenutils.sortSelected', function () {
-	// 	const editor = vscode.window.activeTextEditor;
-	// 	if(editor){
-	// 		let document = editor.document;
-	// 		const documentText = document.getText();
-	// 		const contents = editor.document.getText(editor.selection);
-	// 		let ColemenUtils = vscode.window.createOutputChannel("ColemenUtils");
-	// 		// var output_string = documentText.replace(/\s+[^\S\r\n]$/gm,'')
-
-	// 		// var lines = fileToArrayOfLines(editor);
-	// 		var lines = contents.split(/\r?\n/)
-	// 		var line_count = lines.length
-	// 		var sorted = lines.sort()
-	// 		var output_string = sorted.sort().join('\n');
-
-	// 		// const currentLineRange = editor.document.lineAt(editor.selection.active.line).range;
-
-	// 		// editor.selection.end.line
-	// 		// output_string = output_string.replace('__NEW_LINE__','\n')
-	// 		// ColemenUtils.appendLine(`editor.selection.active.line: ${editor.selection.active.line}`);
-	// 		// ColemenUtils.appendLine(`editor.selection.start.line: ${editor.selection.start.line}`);
-	// 		// ColemenUtils.appendLine(`editor.selection.end.line: ${editor.selection.end.line}`);
-	// 		// ColemenUtils.appendLine(`sorted: ${sorted}`);
-	// 		// ColemenUtils.appendLine(`line_count: ${line_count}`);
-
-	// 		const workEdits = new vscode.WorkspaceEdit();
-	// 		// let range = new vscode.Range(0, 0, editor.document.lineCount, 0);
-	// 		let range = new vscode.Range(editor.selection.start.line,0,editor.selection.end.line+1,0);
-	// 		workEdits.set(document.uri, [vscode.TextEdit.replace(range,output_string)]); // give the edits
-	// 		vscode.workspace.applyEdit(workEdits)
-	// 	}
-	// });
-	// context.subscriptions.push(SortSelected);
-
-	// let SortSelectedReversed = vscode.commands.registerCommand('colemenutils.sortSelectedReversed', function () {
-	// 	const editor = vscode.window.activeTextEditor;
-	// 	if(editor){
-	// 		let document = editor.document;
-	// 		const documentText = document.getText();
-
-	// 		const contents = editor.document.getText(editor.selection);
-	// 		// let ColemenUtils = vscode.window.createOutputChannel("ColemenUtils");
-	// 		// var output_string = documentText.replace(/\s+[^\S\r\n]$/gm,'')
-
-	// 		// var lines = fileToArrayOfLines(editor);
-	// 		var lines = contents.split(/\r?\n/)
-	// 		var line_count = lines.length
-	// 		var sorted = lines.sort()
-	// 		var output_string = lines.reverse().join('\n');
-
-	// 		const workEdits = new vscode.WorkspaceEdit();
-	// 		let range = new vscode.Range(editor.selection.start.line,0,editor.selection.end.line+1,0);
-	// 		workEdits.set(document.uri, [vscode.TextEdit.replace(range,output_string)]); // give the edits
-	// 		vscode.workspace.applyEdit(workEdits)
-	// 	}
-	// });
-	// context.subscriptions.push(SortSelectedReversed);
 
 
 
 
 
 
-
-	//  #       ### #     # #######     #####  ####### ######  ####### ### #     #  #####
-	//  #        #  ##    # #          #     # #     # #     #    #     #  ##    # #     #
-	//  #        #  # #   # #          #       #     # #     #    #     #  # #   # #
-	//  #        #  #  #  # #####       #####  #     # ######     #     #  #  #  # #  ####
-	//  #        #  #   # # #                # #     # #   #      #     #  #   # # #     #
-	//  #        #  #    ## #          #     # #     # #    #     #     #  #    ## #     #
-	//  ####### ### #     # #######     #####  ####### #     #    #    ### #     #  #####
-
+	//  #####  ####### ######  ####### ### #     #  #####
+	// #     # #     # #     #    #     #  ##    # #     #
+	// #       #     # #     #    #     #  # #   # #
+	//  #####  #     # ######     #     #  #  #  # #  ####
+	//       # #     # #   #      #     #  #   # # #     #
+	// #     # #     # #    #     #     #  #    ## #     #
+	//  #####  ####### #     #    #    ### #     #  #####
 
 
 
+
+
+	/**
+	 * ### Shuffle Lines
+	 * **Command:** `colemenutils.shuffleLines`
+	 *
+	 * Randomly shuffles all lines in the current file.
+	 * This command uses the [Fisher-Yates shuffle](https://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle) algorithm to rearrange the lines in a random order.
+	 * Useful for randomizing lists, test data, or any content where order does not matter.
+	 *
+	 * **How to use:**
+	 * - Open the file you want to shuffle.
+	 * - Run the command via the Command Palette (`Ctrl+Shift+P` → "Shuffle Lines") or your assigned keybinding.
+	 * - All lines in the file will be randomly reordered.
+	 *
+	 * > **Note:** This command operates on the entire file, not just the selected lines.
+	 *
+	 */
+	let shuffleLinesCMD = vscode.commands.registerCommand('colemenutils.shuffleLines', function () {
+		const editor = vscode.window.activeTextEditor;
+		if (editor) {
+			const document = editor.document;
+			const lines = [];
+			for (let i = 0; i < document.lineCount; i++) {
+				lines.push(document.lineAt(i).text);
+			}
+			// Fisher-Yates shuffle
+			for (let i = lines.length - 1; i > 0; i--) {
+				const j = Math.floor(Math.random() * (i + 1));
+				[lines[i], lines[j]] = [lines[j], lines[i]];
+			}
+			const output_string = lines.join('\n');
+			const workEdits = new vscode.WorkspaceEdit();
+			let range = new vscode.Range(0, 0, document.lineCount, 0);
+			workEdits.set(document.uri, [vscode.TextEdit.replace(range, output_string)]);
+			vscode.workspace.applyEdit(workEdits);
+		}
+	});
+	context.subscriptions.push(shuffleLinesCMD);
+
+
+	/**
+	 * Sorts lines in the current selection or entire document alphabetically (A-Z).
+	 *
+	 * - Numbers and strings are sorted separately, with placement controlled by the
+	 *   `colemenutils.numberPlacementAlphaSort` setting ("before" or "after").
+	 * - Optionally preserves original formatting and empty lines if
+	 *   `colemenutils.keepOriginalFormatting` is true.
+	 * - Ignores empty lines and lines containing only newlines during sorting.
+	 *
+	 * **Command:** `colemenutils.sortLines`
+	 *
+	 * @command colemenutils.sortLines
+	 * @description Sorts lines alphabetically (A-Z) in the selection or document.
+	 * @example
+	 * // To use:
+	 * // 1. Select lines or leave selection empty to sort the whole document.
+	 * // 2. Run the "Sort Alphabetically A-Z" command from the Command Palette.
+	 * // 3. Lines will be sorted in place.
+	 */
 	let SortLines = vscode.commands.registerCommand('colemenutils.sortLines', function () {
 		const editor = vscode.window.activeTextEditor;
 		if (!editor) return;
@@ -1301,6 +1505,26 @@ function activate(context) {
 	});
 	context.subscriptions.push(SortLines);
 
+
+	/**
+	 * Sorts lines in the current selection or entire document alphabetically in reverse order (Z-A).
+	 *
+	 * - Numbers and strings are sorted separately, with placement controlled by the
+	 *   `colemenutils.numberPlacementAlphaSort` setting ("before" or "after").
+	 * - Optionally preserves original formatting and empty lines if
+	 *   `colemenutils.keepOriginalFormatting` is true.
+	 * - Ignores empty lines and lines containing only newlines during sorting.
+	 *
+	 * **Command:** `colemenutils.sortLinesReversed`
+	 *
+	 * @command colemenutils.sortLinesReversed
+	 * @description Sorts lines alphabetically (Z-A) in the selection or document.
+	 * @example
+	 * // To use:
+	 * // 1. Select lines or leave selection empty to sort the whole document.
+	 * // 2. Run the "Sort Alphabetically Z-A (Reversed)" command from the Command Palette.
+	 * // 3. Lines will be sorted in reverse alphabetical order in place.
+	 */
 	let SortLinesReversed = vscode.commands.registerCommand('colemenutils.sortLinesReversed', function () {
 		const editor = vscode.window.activeTextEditor;
 		if (!editor) return;
@@ -1380,7 +1604,23 @@ function activate(context) {
 
 
 
-
+	/**
+	 * Sorts lines in the current selection or entire document by length (shortest to longest).
+	 *
+	 * - Optionally preserves original formatting and empty lines if
+	 *   `colemenutils.keepOriginalFormatting` is true.
+	 * - Ignores empty lines and lines containing only newlines during sorting.
+	 *
+	 * **Command:** `colemenutils.sortByLength`
+	 *
+	 * @command colemenutils.sortByLength
+	 * @description Sorts lines by length (shortest to longest) in the selection or document.
+	 * @example
+	 * // To use:
+	 * // 1. Select lines or leave selection empty to sort the whole document.
+	 * // 2. Run the "Sort By Length Small to Large" command from the Command Palette.
+	 * // 3. Lines will be sorted by length in place.
+	 */
 	let SortByLength = vscode.commands.registerCommand('colemenutils.sortByLength', function () {
 		const editor = vscode.window.activeTextEditor;
 		if (!editor) return;
@@ -1433,7 +1673,25 @@ function activate(context) {
 	});
 	context.subscriptions.push(SortByLength);
 
-		let SortByLengthReversed = vscode.commands.registerCommand('colemenutils.sortByLengthReversed', function () {
+
+	/**
+	 * Sorts lines in the current selection or entire document by length (longest to shortest).
+	 *
+	 * - Optionally preserves original formatting and empty lines if
+	 *   `colemenutils.keepOriginalFormatting` is true.
+	 * - Ignores empty lines and lines containing only newlines during sorting.
+	 *
+	 * **Command:** `colemenutils.sortByLengthReversed`
+	 *
+	 * @command colemenutils.sortByLengthReversed
+	 * @description Sorts lines by length (longest to shortest) in the selection or document.
+	 * @example
+	 * // To use:
+	 * // 1. Select lines or leave selection empty to sort the whole document.
+	 * // 2. Run the "Sort By Length Large to Small (Reversed)" command from the Command Palette.
+	 * // 3. Lines will be sorted by length in descending order in place.
+	 */
+	let SortByLengthReversed = vscode.commands.registerCommand('colemenutils.sortByLengthReversed', function () {
 		const editor = vscode.window.activeTextEditor;
 		if (!editor) return;
 		let document = editor.document;
@@ -1486,99 +1744,6 @@ function activate(context) {
 		vscode.workspace.applyEdit(workEdits);
 	});
 	context.subscriptions.push(SortByLengthReversed);
-
-
-
-
-
-	// let SortSelectedByLength = vscode.commands.registerCommand('colemenutils.sortSelectedByLength', function () {
-	// 	const editor = vscode.window.activeTextEditor;
-	// 	if(editor){
-	// 		let document = editor.document;
-	// 		const documentText = document.getText();
-
-	// 		const contents = editor.document.getText(editor.selection);
-	// 		// let ColemenUtils = vscode.window.createOutputChannel("ColemenUtils");
-	// 		// var output_string = documentText.replace(/\s+[^\S\r\n]$/gm,'')
-
-	// 		// var lines = fileToArrayOfLines(editor);
-	// 		var lines = contents.split(/\r?\n/)
-	// 		var line_count = lines.length
-	// 		// var sorted = lines.sort()
-	// 		const asc = lines.sort((a,b) => a.length - b.length);
-	// 		var output_string = asc.reverse().join('\n');
-	// 		// var output_string = lines.reverse().join('\n');
-
-	// 		const workEdits = new vscode.WorkspaceEdit();
-	// 		let range = new vscode.Range(editor.selection.start.line,0,editor.selection.end.line+1,0);
-	// 		workEdits.set(document.uri, [vscode.TextEdit.replace(range,output_string)]); // give the edits
-	// 		vscode.workspace.applyEdit(workEdits)
-	// 	}
-	// });
-	// context.subscriptions.push(SortSelectedByLength);
-
-	// let SortSelectedByLengthReversed = vscode.commands.registerCommand('colemenutils.sortSelectedByLengthReversed', function () {
-	// 	const editor = vscode.window.activeTextEditor;
-	// 	if(editor){
-	// 		let document = editor.document;
-	// 		const documentText = document.getText();
-
-	// 		const contents = editor.document.getText(editor.selection);
-	// 		// let ColemenUtils = vscode.window.createOutputChannel("ColemenUtils");
-	// 		// var output_string = documentText.replace(/\s+[^\S\r\n]$/gm,'')
-
-	// 		// var lines = fileToArrayOfLines(editor);
-	// 		var lines = contents.split(/\r?\n/)
-	// 		var line_count = lines.length
-	// 		// var sorted = lines.sort()
-	// 		const asc = lines.sort((a,b) => a.length - b.length);
-	// 		var output_string = asc.join('\n');
-	// 		// var output_string = lines.reverse().join('\n');
-
-	// 		const workEdits = new vscode.WorkspaceEdit();
-	// 		let range = new vscode.Range(editor.selection.start.line,0,editor.selection.end.line+1,0);
-	// 		workEdits.set(document.uri, [vscode.TextEdit.replace(range,output_string)]); // give the edits
-	// 		vscode.workspace.applyEdit(workEdits)
-	// 	}
-	// });
-	// context.subscriptions.push(SortSelectedByLengthReversed);
-
-	// let SortLinesByLength = vscode.commands.registerCommand('colemenutils.sortLinesByLength', function () {
-	// 	const editor = vscode.window.activeTextEditor;
-	// 	if(editor){
-	// 		let document = editor.document;
-	// 		const documentText = document.getText();
-
-	// 		var lines = fileToArrayOfLines(editor);
-	// 		const asc = lines.sort((a,b) => a.length - b.length);
-	// 		var output_string = asc.reverse().join('\n');
-
-	// 		const workEdits = new vscode.WorkspaceEdit();
-	// 		let range = new vscode.Range(0, 0, editor.document.lineCount, 0);
-	// 		workEdits.set(document.uri, [vscode.TextEdit.replace(range,output_string)]); // give the edits
-	// 		vscode.workspace.applyEdit(workEdits)
-	// 	}
-	// });
-	// context.subscriptions.push(SortLinesByLength);
-
-	// let SortLinesByLengthReversed = vscode.commands.registerCommand('colemenutils.sortLinesByLengthReversed', function () {
-	// 	const editor = vscode.window.activeTextEditor;
-	// 	if(editor){
-	// 		let document = editor.document;
-	// 		const documentText = document.getText();
-
-	// 		var lines = fileToArrayOfLines(editor);
-	// 		const asc = lines.sort((a,b) => a.length - b.length);
-	// 		var output_string = asc.join('\n');
-
-	// 		const workEdits = new vscode.WorkspaceEdit();
-	// 		let range = new vscode.Range(0, 0, editor.document.lineCount, 0);
-	// 		workEdits.set(document.uri, [vscode.TextEdit.replace(range,output_string)]); // give the edits
-	// 		vscode.workspace.applyEdit(workEdits)
-	// 	}
-	// });
-	// context.subscriptions.push(SortLinesByLengthReversed);
-
 
 
 
@@ -1811,69 +1976,6 @@ function activate(context) {
 	context.subscriptions.push(linesToListDelimiterCMD);
 
 
-
-
-	let prepApricityComment = vscode.commands.registerCommand('colemenutils.prepApricityComment', function () {
-		// Convert a json string into an apricity comment
-		const editor = vscode.window.activeTextEditor;
-		if(editor){
-			let document = editor.document;
-			const documentText = document.getText();
-			if(documentText.startsWith("_apricity_") == true){
-				vscode.window.showWarningMessage("This is already an apricity comment!");
-				vscode.env.clipboard.writeText(documentText)
-				return
-			}
-
-			// let ColemenUtils = vscode.window.createOutputChannel("ColemenUtils");
-            // var a = documentText.replace("params","p")
-            // Strip quotes from around the keys
-			// const regex = new RegExp('\\"([a-zA-Z0-9_\\s]*)\\":', 'gm')
-
-			var a = apricityReplacements(documentText,false);
-
-			let range = new vscode.Range(0, 0, editor.document.lineCount, 0);
-
-			const workEdits = new vscode.WorkspaceEdit();
-			workEdits.set(document.uri, [vscode.TextEdit.replace(range,a)]); // give the edits
-			vscode.workspace.applyEdit(workEdits)
-			// ColemenUtils.appendLine(`Converting new lines to an array without formatting.`);
-		}
-	});
-	context.subscriptions.push(prepApricityComment);
-
-	let formatApricityComment = vscode.commands.registerCommand('colemenutils.formatApricityComment', function () {
-		const editor = vscode.window.activeTextEditor;
-		if(editor){
-			let document = editor.document;
-			var documentText = document.getText();
-
-			if(documentText.startsWith("_apricity_") == false){
-				vscode.window.showWarningMessage("This is not an apricity comment!");
-				documentText = apricityReplacements(documentText,false);
-
-				// return
-			}
-
-			var a = apricityReplacements(documentText,true);
-
-			console.log(a);
-			var obj = JSON.parse(a);
-			obj = apricityColumnDefaults(obj)
-
-			a = JSON.stringify(obj, null, 4); // 4 spaces as indent
-
-			let range = new vscode.Range(0, 0, editor.document.lineCount, 0);
-			// var output_string = `${indices.join(',')}`;
-			// output_string = output_string.replace(/[,]{2,}/g,",")
-
-			const workEdits = new vscode.WorkspaceEdit();
-			workEdits.set(document.uri, [vscode.TextEdit.replace(range,a)]); // give the edits
-			vscode.workspace.applyEdit(workEdits)
-			// ColemenUtils.appendLine(`Converting new lines to an array without formatting.`);
-		}
-	});
-	context.subscriptions.push(formatApricityComment);
 
 
 
