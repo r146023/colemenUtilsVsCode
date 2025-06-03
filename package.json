@@ -1,14 +1,18 @@
 {
 	"name": "colemenutils",
 	"displayName": "ColemenUtils",
-	"description": "Useful utility commands.",
+	"description": "Comprehensive utility extension for text formatting and productivity",
 	"publisher": "colemen",
-	"version": "0.0.1",
+	"version": "0.0.2",
+	"target": "es2020",
+	"lib":["es2020"],
+	"module": "commonjs",
+	"moduleResolution": "node",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/r146023/colemenUtilsVsCode.git"},
 	"engines": {
-		"vscode": "^1.66.0"
+		"vscode": "^1.74.0"
 	},
 	"categories": [
 		"Other"
@@ -25,12 +29,42 @@
 	"contributes": {
 		"commands": [
 			{
+				"command": "colemenutils.toggleBracketColorizer",
+				"title": "Toggle Bracket Colorizer",
+				"category": "ColemenUtils"
+			},
+			{
+				"command": "colemenutils.refreshBracketColors",
+				"title": "Refresh Bracket Colors",
+				"category": "ColemenUtils"
+			},
+			{
 				"command": "colemenutils.defaultHashSelection",
 				"title": "Hash Selection",
 				"category": "Hash",
 				"shortTitle": "Hash Selection",
 				"enablement": "editorHasSelection"
 			},
+			{
+				"command": "colemenutils.excludeFromBarrel",
+				"title": "Exclude from Barrel",
+				"category": "ColemenUtils"
+			},
+			{
+				"command": "colemenutils.collectStoriesPaths",
+				"title": "Collect Stories File Paths"
+			},
+			{
+				"command": "colemenutils.generateBarrel",
+				"title": "Generate Barrel",
+				"category": "ColemenUtils"
+			},
+			{
+				"command": "colemenutils.excludeDirectoryFromBarrel",
+				"title": "Exclude Directory from Barrel",
+				"category": "ColemenUtils"
+			},
+
 			{
 				"command": "colemenutils.md5HashSelection",
 				"title": "MD5 Hash Selection"
@@ -214,6 +248,146 @@
 				"shortTitle": "Format Tables",
 				"enablement": "editorLangId == 'markdown'",
 				"category": "Markdown"
+			},
+{
+                "command": "colemenutils.formatJSON",
+                "title": "Format JSON",
+                "category": "ColemenUtils JSON"
+            },
+            {
+                "command": "colemenutils.minifyJSON",
+                "title": "Minify JSON",
+                "category": "ColemenUtils JSON"
+            },
+            {
+                "command": "colemenutils.validateJSON",
+                "title": "Validate JSON",
+                "category": "ColemenUtils JSON"
+            },
+            {
+                "command": "colemenutils.jsonToTypeScript",
+                "title": "JSON to TypeScript Interface",
+                "category": "ColemenUtils JSON"
+            },
+            {
+                "command": "colemenutils.jsonToCSV",
+                "title": "JSON to CSV",
+                "category": "ColemenUtils JSON"
+            },
+            {
+                "command": "colemenutils.extractJSONKeys",
+                "title": "Extract JSON Keys",
+                "category": "ColemenUtils JSON"
+            },
+            {
+                "command": "colemenutils.flattenJSON",
+                "title": "Flatten JSON",
+                "category": "ColemenUtils JSON"
+            },
+            {
+                "command": "colemenutils.unflattenJSON",
+                "title": "Unflatten JSON",
+                "category": "ColemenUtils JSON"
+            },
+            {
+                "command": "colemenutils.jsonPath",
+                "title": "Extract JSON Path",
+                "category": "ColemenUtils JSON"
+            },
+            {
+                "command": "colemenutils.sortJSONKeys",
+                "title": "Sort JSON Keys",
+                "category": "ColemenUtils JSON"
+            },
+            {
+                "command": "colemenutils.jsonToYAML",
+                "title": "JSON to YAML",
+                "category": "ColemenUtils JSON"
+            },
+            {
+                "command": "colemenutils.yamlToJSON",
+                "title": "YAML to JSON",
+                "category": "ColemenUtils JSON"
+            },
+            {
+                "command": "colemenutils.jsonSchema",
+                "title": "Generate JSON Schema",
+                "category": "ColemenUtils JSON"
+            },
+            {
+                "command": "colemenutils.escapeJSON",
+                "title": "Escape JSON String",
+                "category": "ColemenUtils JSON"
+            },
+            {
+                "command": "colemenutils.unescapeJSON",
+                "title": "Unescape JSON String",
+                "category": "ColemenUtils JSON"
+            },
+			{
+				"command": "colemenutils.typeScriptToJSON",
+				"title": "TypeScript to JSON",
+				"category": "ColemenUtils JSON"
+			},
+			{
+				"command": "colemenutils.typeScriptToJSONSchema",
+				"title": "TypeScript to JSON Schema",
+				"category": "ColemenUtils JSON"
+			},
+			{
+				"command": "colemenutils.typeScriptToMockJSON",
+				"title": "TypeScript to Mock JSON",
+				"category": "ColemenUtils JSON"
+			},
+			{
+				"command": "colemenutils.commentOutPrints",
+				"title": "Comment Out All Prints",
+				"category": "ColemenUtils Debug"
+			},
+			{
+				"command": "colemenutils.uncommentPrints",
+				"title": "Uncomment All Prints",
+				"category": "ColemenUtils Debug"
+			},
+			{
+				"command": "colemenutils.removePrints",
+				"title": "Remove All Prints",
+				"category": "ColemenUtils Debug"
+			},
+			{
+				"command": "colemenutils.togglePrintComments",
+				"title": "Toggle Print Comments",
+				"category": "ColemenUtils Debug"
+			},
+			{
+				"command": "colemenutils.stripAllComments",
+				"title": "Strip All Comments",
+				"category": "ColemenUtils Debug"
+			},
+			{
+				"command": "colemenutils.normalizeBlankLines",
+				"title": "Normalize Blank Lines",
+				"category": "ColemenUtils Format"
+			},
+			{
+				"command": "colemenutils.enableAutoRenameTag",
+				"title": "Enable Auto Rename Tag",
+				"category": "ColemenUtils Tags"
+			},
+			{
+				"command": "colemenutils.disableAutoRenameTag", 
+				"title": "Disable Auto Rename Tag",
+				"category": "ColemenUtils Tags"
+			},
+			{
+				"command": "colemenutils.toggleAutoRenameTag",
+				"title": "Toggle Auto Rename Tag", 
+				"category": "ColemenUtils Tags"
+			},
+			{
+				"command": "colemenutils.renameTag",
+				"title": "Rename Tag",
+				"category": "ColemenUtils Tags"
 			}
 		],
 		"snippets": [
@@ -405,6 +579,98 @@
 		],
 		"configuration": [
 			{
+				"title": "ColemenUtils JSON",
+				"properties": {
+					"colemenutils.json.indentSize": {
+						"type": "number",
+						"default": 2,
+						"description": "Number of spaces for JSON indentation"
+					}
+				}
+			},
+			{
+				"title": "Auto Rename Tag Settings",
+				"properties": {
+					"colemenutils.autoRenameTag.enabled": {
+						"type": "boolean",
+						"default": true,
+						"description": "Enable automatic tag renaming"
+					},
+					"colemenutils.autoRenameTag.delay": {
+						"type": "number",
+						"default": 100,
+						"description": "Delay in milliseconds before auto-renaming (debounce)"
+					}
+				}
+			},
+			{
+				"title": "ColemenUtils Bracket Colorizer",
+				"properties": {
+					"colemenutils.bracketColorizer.enabled": {
+						"type": "boolean",
+						"default": true,
+						"description": "Enable bracket pair colorization"
+					},
+					"colemenutils.bracketColorizer.colors": {
+						"type": "array",
+						"default": [
+							"#FFD700", "#DA70D6", "#87CEEB", "#98FB98", "#F0E68C",
+							"#FF6347", "#40E0D0", "#EE82EE", "#90EE90", "#FFB6C1"
+						],
+						"description": "Colors for bracket pairs (cycles through levels)"
+					},
+					"colemenutils.bracketColorizer.highlightStyle": {
+						"type": "string",
+						"enum": ["color", "background", "border", "underline", "glow"],
+						"default": "color",
+						"enumDescriptions": [
+							"Color the bracket characters",
+							"Highlight bracket background",
+							"Add colored border around brackets",
+							"Underline brackets with color",
+							"Add glowing effect to brackets"
+						],
+						"description": "How to highlight bracket pairs"
+					},
+					"colemenutils.bracketColorizer.fontWeight": {
+						"type": "string",
+						"enum": ["normal", "bold", "bolder"],
+						"default": "bold",
+						"description": "Font weight for bracket highlighting"
+					},
+					"colemenutils.bracketColorizer.opacity": {
+						"type": "string",
+						"default": "1.0",
+						"description": "Opacity for bracket colors (0.0 to 1.0)"
+					},
+					"colemenutils.bracketColorizer.highlightActiveScope": {
+						"type": "boolean",
+						"default": true,
+						"description": "Highlight the active bracket scope around cursor"
+					},
+					"colemenutils.bracketColorizer.activeScopeColor": {
+						"type": "string",
+						"default": "rgba(255,255,255,0.05)",
+						"description": "Background color for active scope highlighting"
+					}
+				}
+			},
+			{
+				"title": "General Settings",
+				"properties": {
+					"colemenutils.barrelExcludeFiles": {
+						"type": "array",
+						"default": [],
+						"description": "List of file paths to exclude from barrel generation",
+						"markdownDescription": "List of file paths (relative to workspace) to exclude from barrel generation. Files can be added via the 'Exclude from Barrel' context menu.",
+						"items": {
+							"type": "string"
+						}
+					}
+
+				}
+			},
+			{
 			"title": "White Space Settings",
 			"properties": {
 				"colemenutils.highlightTrailingSpaces": {
@@ -439,7 +705,7 @@
 						"Numbers appear before letters.",
 						"Numbers appear after letters."
 					],
-					"description": "Place numeric values before or after alphabetic values when sorting.",	
+					"description": "Place numeric values before or after alphabetic values when sorting.",
 					"markdownDescription": "Place numeric values before or after alphabetic values when sorting."
 				},
 				"colemenutils.keepOriginalFormatting": {
@@ -526,8 +792,32 @@
 					"submenu": "colemenutils.contextHashSubmenu",
 					"when": "editorHasSelection",
 					"group": "navigation"
+				},
+				{
+					"submenu": "colemenutils.contextDebugSubmenu",
+					"when": "editorTextFocus && (editorLangId == 'javascript' || editorLangId == 'typescript' || editorLangId == 'python' || editorLangId == 'php' || editorLangId == 'rust' || editorLangId == 'shellscript' || editorLangId == 'bash' || editorLangId == 'batch' || editorLangId == 'powershell' || editorLangId == 'javascriptreact' || editorLangId == 'typescriptreact')",
+					"group": "navigation"
 				}
 			],
+
+			"explorer/context": [
+				{
+					"command": "colemenutils.generateBarrel",
+					"when": "explorerResourceIsFolder && colemenutils.isJSProject",
+					"group": "navigation"
+				},
+				{
+					"command": "colemenutils.excludeFromBarrel",
+					"when": "!explorerResourceIsFolder && resourceExtname =~ /\\.(ts|tsx|js|jsx)$/ && colemenutils.isJSProject",
+					"group": "navigation"
+				},
+				{
+					"command": "colemenutils.excludeDirectoryFromBarrel",
+					"when": "explorerResourceIsFolder && colemenutils.isJSProject",
+					"group": "navigation"
+				}
+			],
+
 			"colemenutils.contextSubmenu": [
 				{
 					"command": "colemenutils.insertUUIDs",
@@ -598,7 +888,10 @@
 				}
 			],
 			"colemenutils.contextFormatGeneralSubmenu": [
-
+				{
+					"command": "colemenutils.normalizeBlankLines",
+					"group": "1_parse"
+				},
 				{
 					"command": "colemenutils.linesToArray",
 					"group": "1_main"
@@ -664,6 +957,28 @@
 					"command": "colemenutils.stripExcessiveSpaces",
 					"group": "1_parse"
 				}
+			],
+			"colemenutils.contextDebugSubmenu": [
+				{
+					"command": "colemenutils.commentOutPrints",
+					"group": "1_comment"
+				},
+				{
+					"command": "colemenutils.uncommentPrints",
+					"group": "1_comment"
+				},
+				{
+					"command": "colemenutils.togglePrintComments",
+					"group": "1_comment"
+				},
+				{
+					"command": "colemenutils.stripAllComments",
+					"group": "1_comment"
+				},
+				{
+					"command": "colemenutils.removePrints",
+					"group": "2_remove"
+				}
 			]
 		},
 		"submenus": [
@@ -686,6 +1001,31 @@
 				"id": "colemenutils.contextHashSubmenu",
 				"label": "Hash",
 				"icon": "☣"
+			},
+			{
+				"id": "colemenutils.contextFormatGeneralSubmenu",
+				"label": "Format",
+				"icon": "$(tools)"
+			},
+			{
+				"id": "colemenutils.contextFormatSVGSubmenu",
+				"label": "SVG Format",
+				"icon": "$(tools)"
+			},
+			{
+				"id": "colemenutils.contextSortSubmenu",
+				"label": "Sort",
+				"icon": "$(tools)"
+			},
+			{
+				"id": "colemenutils.contextHashSubmenu",
+				"label": "Hash",
+				"icon": "☣"
+			},
+			{
+				"id": "colemenutils.contextDebugSubmenu",
+				"label": "Debug",
+				"icon": "$(debug)"
 			}
 		]
 	},
