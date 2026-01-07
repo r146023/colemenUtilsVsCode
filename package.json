@@ -3,7 +3,7 @@
 	"displayName": "ColemenUtils",
 	"description": "Comprehensive utility extension for text formatting and productivity",
 	"publisher": "colemen",
-	"version": "0.0.2",
+	"version": "0.0.8",
 	"target": "es2020",
 	"lib":["es2020"],
 	"module": "commonjs",
@@ -28,6 +28,7 @@
 	"main": "./extension.js",
 	"contributes": {
 		"commands": [
+			
 			{
 				"command": "colemenutils.toggleBracketColorizer",
 				"title": "Toggle Bracket Colorizer",
@@ -147,6 +148,10 @@
 				"title": "Lines to Array of Strings"
 			},
 			{
+				"command": "colemenutils.toggleCopilot",
+				"title": "Toggle Copilot"
+			},
+			{
 				"command": "colemenutils.LinesToFormattedArray",
 				"title": "Lines to Array of Typed Values"
 			},
@@ -181,6 +186,14 @@
 			{
 				"command": "colemenutils.stripTrailingSpaces",
 				"title": "Strip trailing spaces"
+			},
+			{
+				"command": "colemenutils.copyCurrentLine",
+				"title": "Copy the current line"
+			},
+			{
+				"command": "colemenutils.deleteCurrentLine",
+				"title": "Delete the current line"
 			},
 			{
 				"command": "colemenutils.stripExcessiveSpaces",
@@ -365,6 +378,11 @@
 				"category": "ColemenUtils Debug"
 			},
 			{
+				"command": "colemenutils.stripPlusAndHyphenLines",
+				"title": "Strip Plus and Hyphen Lines",
+				"category": "ColemenUtils Format"
+			},
+			{
 				"command": "colemenutils.normalizeBlankLines",
 				"title": "Normalize Blank Lines",
 				"category": "ColemenUtils Format"
@@ -431,9 +449,24 @@
 				"when": "editorLangId == 'markdown' && editorTextFocus"
 			},
 			{
+				"key": "shift+delete",
+				"command": "colemenutils.deleteCurrentLine",
+				"when": "editorTextFocus && (isWindows || isLinux)"
+			},
+			{
 				"key": "ctrl+shift+delete",
-				"command": "colemenutils.clearCurrentLine",
-				"when": "editorTextFocus"
+				"command": "colemenutils.cutCurrentLine",
+				"when": "editorTextFocus && (isWindows || isLinux)"
+			},
+			{
+				"key": "alt+c",
+				"command": "colemenutils.copyCurrentLine",
+				"when": "editorTextFocus && (isWindows || isLinux)"
+			},
+			{
+				"key": "ctrl+alt+x",
+				"command": "colemenutils.stripTrailingSpaces",
+				"when": "editorTextFocus && (isWindows || isLinux)"
 			},
 			{
 				"key": "ctrl+b",
@@ -589,6 +622,44 @@
 				}
 			},
 			{
+				"title": "Todo Highlighting",
+				"properties": {
+					"colemenutils.todoCodeLens.enabled": {
+						"type": "boolean",
+						"default": true,
+						"description": "Enable TODO/FIXME CodeLens and highlighting."
+					},
+					"colemenutils.todoCodeLens.highlightBackground": {
+						"type": "string",
+						"format": "color",
+						"default": "#441a34",
+						"description": "Background color for the full-line TODO highlight (CSS color or hex). `colemenutils.todoCodeLens.highlightBackground`"
+					},
+					"colemenutils.todoCodeLens.fontColor": {
+						"type": "string",
+						"format": "color",
+						"default": "#e78de3e6",
+						"description": "The font color of the todo (CSS color or hex). `colemenutils.todoCodeLens.fontColor`"
+					},
+					"colemenutils.todoCodeLens.underlineEnabled": {
+						"type": "boolean",
+						"default": true,
+						"description": "If the todo should be underlined. `colemenutils.todoCodeLens.underlineEnabled`"
+					},
+					"colemenutils.todoCodeLens.underlineColor": {
+						"type": "string",
+						"format": "color",
+						"default": "#ff00f2",
+						"description": "Underline color used for TODO highlight (CSS color). `colemenutils.todoCodeLens.underlineColor`"
+					},
+					"colemenutils.todoCodeLens.isWholeLine": {
+						"type": "boolean",
+						"default": true,
+						"description": "Apply the TODO highlight as a whole-line decoration. `colemenutils.todoCodeLens.isWholeLine`"
+					}
+				}
+			},
+			{
 				"title": "Auto Rename Tag Settings",
 				"properties": {
 					"colemenutils.autoRenameTag.enabled": {
@@ -600,6 +671,21 @@
 						"type": "number",
 						"default": 100,
 						"description": "Delay in milliseconds before auto-renaming (debounce)"
+					}
+				}
+			},
+			{
+				"title": "ColemenUtils Lines to String Array",
+				"properties": {
+					"colemenutils.linesToStringArray.wrapLines": {
+						"type": "boolean",
+						"default": true,
+						"description": "Enable automatic line wrapping based on the specified maximum line length"
+					},
+					"colemenutils.linesToStringArray.maxLineLength": {
+						"type": "number",
+						"default": 80,
+						"description": "The maximum line length for wrapping lines in the string array"
 					}
 				}
 			},
@@ -893,6 +979,10 @@
 					"group": "1_parse"
 				},
 				{
+					"command": "colemenutils.stripPlusAndHyphenLines",
+					"group": "1_parse"
+				},
+				{
 					"command": "colemenutils.linesToArray",
 					"group": "1_main"
 				},
@@ -1027,6 +1117,26 @@
 				"label": "Debug",
 				"icon": "$(debug)"
 			}
+		],
+		"colors": [
+			{
+				"id": "colemenutils.fileDecoration.error",
+				"description": "Explorer label color for files that have errors (ColemenUtils)",
+				"defaults": {
+					"dark": "#4bd6a8",
+					"light": "#4b4dd6",
+					"highContrast": "#a34bd6"
+				}
+			},
+			{
+				"id": "colemenutils.fileDecoration.modifiedError",
+				"description": "Explorer label color for files that are modified and have errors (ColemenUtils)",
+				"defaults": {
+					"dark": "#a14bd6",
+					"light": "#8741d1",
+					"highContrast": "#a14bd6"
+				}
+			}
 		]
 	},
 	"scripts": {
@@ -1035,6 +1145,8 @@
 		"publish": "vsce package"
 	},
 	"devDependencies": {
+	},
+	"dependencies": {
 		"@types/glob": "^7.2.0",
 		"@types/mocha": "^9.1.0",
 		"@types/node": "14.x",
@@ -1043,9 +1155,7 @@
 		"eslint": "^8.11.0",
 		"glob": "^7.2.0",
 		"mocha": "^9.2.2",
-		"typescript": "^4.5.5"
-	},
-	"dependencies": {
+		"typescript": "^4.5.5",
 		"figlet": "^1.8.1",
 		"xml-js": "^1.6.11",
 		"xml-parser": "^1.2.1"
