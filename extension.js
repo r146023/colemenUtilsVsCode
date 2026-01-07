@@ -16,8 +16,12 @@ const { registerArrayCommands } = require('./commands/arrayCommands');
 const { registerSvgCommands } = require('./commands/svgCommands');
 const { registerBracketColorizer } = require('./commands/bracketColorizer');
 const { registerJsonCommands } = require('./commands/jsonCommands');
+const { registerTodoCodeLens } = require('./commands/todoCodeLens');
 const { registerDebugCommands } = require('./commands/debugCommands');
+const { registerToggleCopilot } = require('./commands/toggleCopilot');
 // const { registerAutoRenameTag } = require('./commands/autoRenameTag');
+// const { registerFileDecorations } = require('./commands/fileDecorationProvider');
+const { registerMstep } = require('./commands/mstep');
 
 // import * as vscode from 'vscode';
 
@@ -47,6 +51,7 @@ function activate(context) {
 	};
 
 	checkIsJSProject();
+	registerTodoCodeLens(context);
     registerBarrelCommands(context);
     registerHashingCommands(context);
     registerTextFormattingCommands(context);
@@ -61,6 +66,10 @@ function activate(context) {
 	registerBracketColorizer(context);
     registerJsonCommands(context);
     registerDebugCommands(context);
+    registerToggleCopilot(context);
+    // registerFileDecorations(context);
+    registerMstep(context);
+	// context.subscriptions.push(vscode.window.registerFileDecorationProvider(new ColemenFileDecorationProvider()));
 	// registerAutoRenameTag(context);
 
 }
@@ -74,5 +83,7 @@ module.exports = {
 	activate,
 	deactivate
 }
+
+
 
 
