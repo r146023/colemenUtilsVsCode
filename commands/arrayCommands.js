@@ -1,6 +1,7 @@
 const vscode = require('vscode');
 const {  mostCommonNonAlphanumeric } = require('../helpers/editorHelpers');
 const { fileOrSelectionToArrayOfLines } = require('../helpers/editorHelpers');
+const { getConfigValue } = require('../helpers/configHelpers');
 /**
  * Array Commands Module for ColemenUtils
  * Handles all array and list manipulation functionality
@@ -29,7 +30,7 @@ function registerArrayCommands(context) {
 async function linesToStringArray() {
     const editor = vscode.window.activeTextEditor;
     if (!editor) return;
-    
+
     let document = editor.document;
     const documentText = document.getText();
 
@@ -43,8 +44,56 @@ async function linesToStringArray() {
         }
     });
 
+    const enableLineWrap = getConfigValue('linesToStringArray.wrapLines', true);
+    const max_line_length = getConfigValue('linesToStringArray.maxLineLength', 80);
+
+    if (!enableLineWrap) {
+        let range = new vscode.Range(0, 0, editor.document.lineCount, 0);
+        var output_string = `[${indices.join(', ')}]`;
+        const workEdits = new vscode.WorkspaceEdit();
+        workEdits.set(document.uri, [vscode.TextEdit.replace(range, output_string)]);
+        vscode.workspace.applyEdit(workEdits);
+        return;
+    }
+
+
+    // var max_line_length = 80;
+    var line_arrays = []
+
+    let current_line = [];
+    for (let i = 0; i < indices.length; i++) {
+        // @Mstep [] Calculate the length of this term plus commas and spaces
+        let term_length = indices[i].length + 2;
+        let current_line_length = current_line.join(', ').length;
+
+        if (current_line_length + term_length > max_line_length) {
+            // If adding this term exceeds the max line length, push the current line and start a new one
+            // let new_line = current_line.join(',');
+            line_arrays.push(current_line);
+            // lines.push('\n');
+            current_line = [indices[i]];
+        } else {
+            // Otherwise, add the term to the current line
+            current_line.push(indices[i]);
+        }
+    }
+    var lines = [];
+    for (let j = 0; j < line_arrays.length; j++) {
+        let new_line = line_arrays[j].join(', ');
+        // if this is the last line, don't add a comma at the end
+        // if (j === line_arrays.length - 1) {
+        //     lines.push(new_line+'\n');
+        //     continue;
+        // }
+        lines.push(new_line+'__NEW_KFBR392_LINE__');
+    }
+
+    indices = lines;
+
     let range = new vscode.Range(0, 0, editor.document.lineCount, 0);
-    var output_string = `[${indices.join(',')}]`;
+    var output_string = `[\n${indices.join(',')}]`;
+    output_string = output_string.replace(/__NEW_KFBR392_LINE__,/gmi, ',\n');
+    output_string = output_string.replace(/__NEW_KFBR392_LINE__/gmi, '\n');
 
     const workEdits = new vscode.WorkspaceEdit();
     workEdits.set(document.uri, [vscode.TextEdit.replace(range, output_string)]);
@@ -124,18 +173,28 @@ async function linesToArray() {
 
 /**
  * Convert lines to image tag format
+ * @example line1;line2;line3
  */
 async function linesToImageTag() {
     const editor = vscode.window.activeTextEditor;
     if (!editor) return;
-    
+
     let document = editor.document;
     const documentText = document.getText();
+    var content = documentText;
+    var tmpcon = [];
+    content.split(/\r?\n/).forEach((element) => {
+        if (element.length > 0) {
+            if (element.startsWith("###")) return;
+            tmpcon.push(element);
+        }
+    });
+    content = tmpcon.join("\n").replace(/[;,\s]+/gmi, "\n");
 
-    var content = documentText.replace(/[;,\s]+/gmi, "\n");
     var indices = [];
     content.split(/\r?\n/).forEach((element) => {
         if (element.length > 0) {
+            // if (element.startsWith("###")) return;
             var value = `${element}`;
             indices.push(value);
         }
