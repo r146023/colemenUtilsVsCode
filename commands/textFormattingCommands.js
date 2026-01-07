@@ -2,6 +2,7 @@ const vscode = require('vscode');
 const figlet = require('figlet');
 const { fileToArrayOfLines } = require('../helpers/editorHelpers');
 const { getConfigValue } = require('../helpers/configHelpers');
+const { humanizeString } = require('../helpers/textHelpers');
 /**
  * Text Formatting Commands Module for ColemenUtils
  * Handles all text transformation and formatting functionality
@@ -22,8 +23,59 @@ function registerTextFormattingCommands(context) {
         vscode.commands.registerCommand('colemenutils.escapeSelectedSingleBackSlash', escapeSelectedSingleBackSlash),
         vscode.commands.registerCommand('colemenutils.singleToDoubleQuote', singleToDoubleQuote),
         vscode.commands.registerCommand('colemenutils.reverseSlashesInWindowsPaths', reverseSlashesInWindowsPaths),
-        vscode.commands.registerCommand('colemenutils.normalizeBlankLines', normalizeBlankLines)
+        vscode.commands.registerCommand('colemenutils.normalizeBlankLines', normalizeBlankLines),
+        vscode.commands.registerCommand('colemenutils.stripPlusAndHyphenLines', stripPlusAndHyphenLines)
     );
+}
+
+
+/**
+ * Remove entire lines that start with a hyphen (optionally leading spaces)
+ * and remove leading plus signs (and any leading spaces) from lines that start with '+'.
+ * Operates on the entire open document.
+ */
+async function stripPlusAndHyphenLines() {
+    const editor = vscode.window.activeTextEditor;
+    if (!editor) return;
+
+    const document = editor.document;
+    const originalText = document.getText();
+    const eol = document.eol === vscode.EndOfLine.CRLF ? '\r\n' : '\n';
+
+    // Split preserving content (handles CRLF/LF)
+    const lines = originalText.split(/\r\n|\r|\n/);
+    const outLines = [];
+
+    for (const line of lines) {
+        if (/^\s*-/.test(line)) {
+            // Skip entire line if it starts (optionally after spaces) with a hyphen
+            continue;
+        }
+        if (/^\s*\+/.test(line)) {
+            // Remove leading spaces and the plus sign only
+            outLines.push(line.replace(/^\s*\+/, ''));
+            continue;
+        }
+        if (/^\s*[#/]+\s*...existing\s*code.../.test(line)){
+            outLines.push(line.replace(/^\s*[#/]+\s*...existing\s*code.../, ''));
+            continue;
+
+        }
+        outLines.push(line);
+    }
+
+    var newText = outLines.join(eol);
+    // newText = humanizeString(newText);
+
+    if (newText === originalText) return;
+
+    const firstLine = document.lineAt(0);
+    const lastLine = document.lineAt(document.lineCount - 1);
+    const fullRange = new vscode.Range(firstLine.range.start, lastLine.range.end);
+
+    await editor.edit(editBuilder => {
+        editBuilder.replace(fullRange, newText);
+    });
 }
 
 /**
