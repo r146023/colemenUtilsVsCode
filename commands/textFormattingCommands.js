@@ -24,10 +24,11 @@ function registerTextFormattingCommands(context) {
         vscode.commands.registerCommand('colemenutils.singleToDoubleQuote', singleToDoubleQuote),
         vscode.commands.registerCommand('colemenutils.reverseSlashesInWindowsPaths', reverseSlashesInWindowsPaths),
         vscode.commands.registerCommand('colemenutils.normalizeBlankLines', normalizeBlankLines),
-        vscode.commands.registerCommand('colemenutils.stripPlusAndHyphenLines', stripPlusAndHyphenLines)
+        vscode.commands.registerCommand('colemenutils.stripPlusAndHyphenLines', stripPlusAndHyphenLines),
+        vscode.commands.registerCommand('colemenutils.indentSelectedLines', indentSelectedLines)
     );
 }
-
+// TODO []: (javascript,frontend,textFormatting) Command that indents all selected lines (by moving cursor to start)
 
 /**
  * Remove entire lines that start with a hyphen (optionally leading spaces)
@@ -425,6 +426,90 @@ async function normalizeBlankLines() {
     } else {
         vscode.window.showErrorMessage('Failed to normalize blank lines');
     }
+}
+
+
+/**
+ * Indents the beginning of every line touched by the current selections.
+ * - Works with multi-cursor / multi-selection.
+ * - If all selections are empty (carets only), indents the line for each caret.
+ * - Uses the editor's indent settings:
+ *   - insertSpaces + tabSize -> inserts spaces
+ *   - otherwise inserts a tab
+ *
+ * @param {object} [opts]
+ * @param {string} [opts.indentText] If provided, this exact string is inserted (overrides editor settings).
+ */
+async function indentSelectedLines(opts = {}) {
+    const editor = vscode.window.activeTextEditor;
+    if (!editor) return;
+
+    const doc = editor.document;
+
+    const indentText =
+        typeof opts.indentText === "string"
+        ? opts.indentText
+        : (editor.options.insertSpaces
+            ? " ".repeat(Number(editor.options.tabSize) || 4)
+            : "\t");
+
+    // Collect all line numbers touched by selections/carets
+    const lineSet = new Set();
+
+    for (const sel of editor.selections) {
+        const startLine = Math.min(sel.start.line, sel.end.line);
+        const endLine = Math.max(sel.start.line, sel.end.line);
+
+        // If selection is empty, indent only that caret line.
+        if (sel.isEmpty) {
+        lineSet.add(sel.start.line);
+        continue;
+        }
+
+        // If selection ends at column 0, it usually means the user selected "up to"
+        // the start of that line—don’t include that end line.
+        const adjustedEndLine = sel.end.character === 0 ? endLine - 1 : endLine;
+
+        for (let line = startLine; line <= adjustedEndLine; line++) {
+        if (line >= 0 && line < doc.lineCount) lineSet.add(line);
+        }
+    }
+
+    if (lineSet.size === 0) return;
+
+    // Convert to sorted array DESC so edits don't shift subsequent insert positions.
+    const lines = Array.from(lineSet).sort((a, b) => b - a);
+
+    await editor.edit(
+        (editBuilder) => {
+        for (const line of lines) {
+            const pos = doc.lineAt(line).range.start; // beginning of line
+            editBuilder.insert(pos, indentText);
+        }
+        },
+        { undoStopBefore: true, undoStopAfter: true }
+    );
+}
+
+
+// TODO []: (javascript,frontend,textFormatting) Finish implementing reverseCharacters.
+async function reverseCharacters() {
+    const editor = vscode.window.activeTextEditor;
+    if (!editor) return;
+    const document = editor.document;
+
+
+    var contents = editor.document.getText(editor.selection);
+    // var lines = contents.split(/\r?\n/);
+    var chars = contents.split("")
+
+    chars.reverse()
+
+    const output_string = chars.join('');
+    const workEdits = new vscode.WorkspaceEdit();
+    let range = new vscode.Range(editor.selection.start.line, 0, editor.selection.end.line + 1, 0);
+    workEdits.set(document.uri, [vscode.TextEdit.replace(range, output_string)]);
+    vscode.workspace.applyEdit(workEdits);
 }
 
 module.exports = {
