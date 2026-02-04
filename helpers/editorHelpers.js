@@ -111,10 +111,31 @@ function matchCasing(original, replacement) {
     return replacement;
 }
 
+/**
+ * Determine whether the given editor contains at least one non-empty selection.
+ *
+ * @param {import('vscode').TextEditor} editor - The editor whose selections will be inspected.
+ * @returns {boolean} True if any selection in the editor is not empty; otherwise false.
+ */
+function hasSelection(editor){
+    return editor.selections.some(s => !s.isEmpty);
+}
+function getText(editor){
+    var doc = editor.document;
+    return doc.getText();
+}
+function getTextAsLinesArray(editor){
+    var txt = getText(editor);
+    return txt.split(/\r?\n/)
+}
+
 module.exports = {
     mostCommonNonAlphanumeric,
     fileToArrayOfLines,
     fileOrSelectionToArrayOfLines,
     generateUUIDv4,
-    matchCasing
+    matchCasing,
+    getText,
+    getTextAsLinesArray,
+    hasSelection
 };
