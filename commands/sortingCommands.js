@@ -1,6 +1,10 @@
 const vscode = require('vscode');
 const path = require('path');
-const { fileOrSelectionToArrayOfLines } = require('../helpers/editorHelpers');
+const { 
+    fileOrSelectionToArrayOfLines,
+    hasSelection,
+    getTextAsLinesArray
+} = require('../helpers/editorHelpers');
 const { getConfigValue } = require('../helpers/configHelpers');
 /**
  * Sorting Commands Module for ColemenUtils
@@ -17,7 +21,8 @@ function registerSortingCommands(context) {
         vscode.commands.registerCommand('colemenutils.sortLines', sortLines),
         vscode.commands.registerCommand('colemenutils.sortLinesReversed', sortLinesReversed),
         vscode.commands.registerCommand('colemenutils.sortByLength', sortByLength),
-        vscode.commands.registerCommand('colemenutils.sortByLengthReversed', sortByLengthReversed)
+        vscode.commands.registerCommand('colemenutils.sortByLengthReversed', sortByLengthReversed),
+        vscode.commands.registerCommand('colemenutils.reverseLines', reverseLines)
     );
 
 
@@ -384,6 +389,68 @@ function registerAutoSorter(context) {
 }
 
 
+async function reverseLines() {
+    const editor = vscode.window.activeTextEditor;
+    if (!editor) return;
+
+    const doc = editor.document;
+    const eol = doc.eol === vscode.EndOfLine.CRLF ? "\r\n" : "\n";
+
+    // VS Code supports multiple selections (multi-cursor)
+    const sels = editor.selections;
+
+    const hasAnySelection = hasSelection(editor);
+
+    // Helper: build a full-line range covering the selection/cursor lines
+    const lineRangeForSelection = (sel) => {
+        const startLine = Math.min(sel.start.line, sel.end.line);
+        const endLine = Math.max(sel.start.line, sel.end.line);
+
+        const start = doc.lineAt(startLine).range.start;
+        const end = doc.lineAt(endLine).range.end; // end of last line (no newline)
+        return new vscode.Range(start, end);
+    };
+
+    if (!hasAnySelection) {
+        // No selection anywhere -> reverse entire document lines
+        const fullText = doc.getText();
+        const lines = getTextAsLinesArray(editor).reverse();
+        // const lines = fullText.split(/\r?\n/).reverse();
+        const out = lines.join(eol);
+
+        await editor.edit(editBuilder => {
+            const fullRange = new vscode.Range(
+                doc.positionAt(0),
+                doc.positionAt(fullText.length)
+            );
+            editBuilder.replace(fullRange, out);
+        });
+
+        return;
+    }
+
+    // There is at least one real selection -> reverse per-selection, independently.
+    // Sort selections by start line descending so edits don't shift later ranges.
+    const sorted = [...sels].sort((a, b) => {
+        const ar = lineRangeForSelection(a);
+        const br = lineRangeForSelection(b);
+        return br.start.line - ar.start.line || br.start.character - ar.start.character;
+    });
+
+    await editor.edit(editBuilder => {
+        for (const sel of sorted) {
+            if (sel.isEmpty) continue; // cursor-only: do nothing in "selection mode"
+
+            const range = lineRangeForSelection(sel);
+            const text = doc.getText(range);
+
+            const lines = text.split(/\r?\n/).reverse();
+            const out = lines.join(eol);
+
+            editBuilder.replace(range, out);
+        }
+    });
+}
 
 
 
