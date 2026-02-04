@@ -1,4 +1,6 @@
 const vscode = require('vscode');
+const { getText } = require('../helpers/editorHelpers');
+const { toCamelCase } = require('../helpers/textHelpers');
 // XML-JS might need error handling:
 let convert;
 try {
@@ -20,9 +22,123 @@ function registerSvgCommands(context) {
     context.subscriptions.push(
         vscode.commands.registerCommand('colemenutils.FormatSVGContentCMD', formatSVGContent),
         vscode.commands.registerCommand('colemenutils.CaptureSVGViewboxValue', captureSVGViewboxValue),
-        vscode.commands.registerCommand('colemenutils.CaptureSVGBody', captureSVGBody)
+        vscode.commands.registerCommand('colemenutils.CaptureSVGBody', captureSVGBody),
+        vscode.commands.registerCommand('colemenutils.SVGPropsToJSX', SVGPropsToJSX)
     );
 }
+
+const SVG_KEBAB_TO_CAMEL = [
+    ["alignment-baseline","alignmentBaseline"],
+    ["baseline-shift","baselineShift"],
+    ["clip-path","clipPath"],
+    ["clip-rule","clipRule"],
+    ["color-interpolation","colorInterpolation"],
+    ["color-interpolation-filters","colorInterpolationFilters"],
+    ["color-profile","colorProfile"],
+    ["color-rendering","colorRendering"],
+    ["dominant-baseline","dominantBaseline"],
+    ["enable-background","enableBackground"],
+    ["fill-opacity","fillOpacity"],
+    ["fill-rule","fillRule"],
+    ["flood-color","floodColor"],
+    ["flood-opacity","floodOpacity"],
+    ["font-family","fontFamily"],
+    ["font-size","fontSize"],
+    ["font-size-adjust","fontSizeAdjust"],
+    ["font-stretch","fontStretch"],
+    ["font-style","fontStyle"],
+    ["font-variant","fontVariant"],
+    ["font-weight","fontWeight"],
+    ["glyph-name","glyphName"],
+    ["glyph-orientation-horizontal","glyphOrientationHorizontal"],
+    ["glyph-orientation-vertical","glyphOrientationVertical"],
+    ["horiz-adv-x","horizAdvX"],
+    ["horiz-origin-x","horizOriginX"],
+    ["image-rendering","imageRendering"],
+    ["letter-spacing","letterSpacing"],
+    ["lighting-color","lightingColor"],
+    ["marker-end","markerEnd"],
+    ["marker-mid","markerMid"],
+    ["marker-start","markerStart"],
+    ["marker-height","markerHeight"],
+    ["marker-units","markerUnits"],
+    ["marker-width","markerWidth"],
+    ["mask-content-units","maskContentUnits"],
+    ["mask-units","maskUnits"],
+    ["num-octaves","numOctaves"],
+    ["paint-order","paintOrder"],
+    ["path-length","pathLength"],
+    ["pointer-events","pointerEvents"],
+    ["preserve-alpha","preserveAlpha"],
+    ["preserve-aspect-ratio","preserveAspectRatio"],
+    ["primitive-units","primitiveUnits"],
+    ["ref-x","refX"],
+    ["ref-y","refY"],
+    ["shape-rendering","shapeRendering"],
+    ["specular-constant","specularConstant"],
+    ["specular-exponent","specularExponent"],
+    ["spread-method","spreadMethod"],
+    ["stop-color","stopColor"],
+    ["stop-opacity","stopOpacity"],
+    ["stroke-dasharray","strokeDasharray"],
+    ["stroke-dashoffset","strokeDashoffset"],
+    ["stroke-linecap","strokeLinecap"],
+    ["stroke-linejoin","strokeLinejoin"],
+    ["stroke-miterlimit","strokeMiterlimit"],
+    ["stroke-opacity","strokeOpacity"],
+    ["stroke-width","strokeWidth"],
+    ["text-anchor","textAnchor"],
+    ["text-decoration","textDecoration"],
+    ["text-rendering","textRendering"],
+    ["transform-origin","transformOrigin"],
+    ["unicode-bidi","unicodeBidi"],
+    ["vector-effect","vectorEffect"],
+    ["vert-adv-y","vertAdvY"],
+    ["vert-origin-x","vertOriginX"],
+    ["vert-origin-y","vertOriginY"],
+    ["word-spacing","wordSpacing"],
+    ["writing-mode","writingMode"],
+
+    // Filters / fe*
+    ["base-frequency","baseFrequency"],
+    ["diffuse-constant","diffuseConstant"],
+    ["edge-mode","edgeMode"],
+    ["kernel-matrix","kernelMatrix"],
+    ["kernel-unit-length","kernelUnitLength"],
+    ["key-points","keyPoints"],
+    ["key-splines","keySplines"],
+    ["key-times","keyTimes"],
+    ["length-adjust","lengthAdjust"],
+    ["limiting-cone-angle","limitingConeAngle"],
+    ["order","order"],
+    ["pattern-content-units","patternContentUnits"],
+    ["pattern-transform","patternTransform"],
+    ["pattern-units","patternUnits"],
+    ["points-at-x","pointsAtX"],
+    ["points-at-y","pointsAtY"],
+    ["points-at-z","pointsAtZ"],
+    ["result","result"],
+    ["scale","scale"],
+    ["std-deviation","stdDeviation"],
+    ["stitch-tiles","stitchTiles"],
+    ["surface-scale","surfaceScale"],
+    ["target-x","targetX"],
+    ["target-y","targetY"],
+    ["view-box","viewBox"],
+    ["x-channel-selector","xChannelSelector"],
+    ["y-channel-selector","yChannelSelector"],
+
+    // xlink era (still encountered)
+    ["xlink:actuate","xlinkActuate"],
+    ["xlink:arcrole","xlinkArcrole"],
+    ["xlink:href","xlinkHref"],
+    ["xlink:role","xlinkRole"],
+    ["xlink:show","xlinkShow"],
+    ["xlink:title","xlinkTitle"],
+    ["xlink:type","xlinkType"],
+];
+
+
 
 /**
  * Format SVG content by cleaning up groups and structure
@@ -188,6 +304,56 @@ async function captureSVGBody() {
     var finalContent = convert.js2xml(tmpWrap, compileOptions);
     vscode.env.clipboard.writeText(finalContent);
 }
+
+/**
+ * Convert SVG properties from kebab-case to camelCase for JSX compatibility
+ */
+async function SVGPropsToJSX() {
+    const editor = vscode.window.activeTextEditor;
+    if (!editor) return;
+
+    const document = editor.document;
+    var txt = String(getText(editor));
+    var ignores = [
+        "viewBox",
+        "xmlns",
+        "xmlns:serif",
+        "xmlns:xlink",
+        "xml:space",
+
+    ]
+
+    // @Mstep [] first go through the known replacements.
+    for(const [kebab, camel] of SVG_KEBAB_TO_CAMEL){
+        const regex = new RegExp(`${kebab}=(["'])`, 'g');
+        const replacement = `${camel}=$1`;
+        txt = txt.replace(regex, replacement);
+    }
+
+    // @Mstep [] now do a general scan for any remaining kebab-case attributes.
+    for (const match of txt.matchAll(/([a-zA-Z0-9-:]*)=(["'])/g)) {
+        if(!match[1] || !match[2]) continue;
+        if(match[1].length < 2) continue;
+        if(ignores.includes(match[1])) continue;
+
+
+        const original = match[1];
+        var camel = toCamelCase(match[1]);
+        if(camel === original) continue;
+        var full = `${camel}=${match[2]}`;
+        // console.log("full : ",full);
+        txt = txt.replace(match[0], full);
+    }
+
+
+
+    const output_string = txt;
+    const workEdits = new vscode.WorkspaceEdit();
+    let range = new vscode.Range(0, 0, document.lineCount, 0);
+    workEdits.set(document.uri, [vscode.TextEdit.replace(range, output_string)]);
+    vscode.workspace.applyEdit(workEdits);
+}
+
 
 module.exports = {
     registerSvgCommands
