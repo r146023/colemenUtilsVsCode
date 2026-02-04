@@ -36,55 +36,73 @@ async function linesToStringArray() {
 
     const result = documentText.split(/\r?\n/);
     var indices = [];
+    // @Mstep [LOOP] iterate through each line
     result.forEach((element) => {
+        // @Mstep [IF] if the line has content
         if (element.length > 0) {
+            // @Mstep [] strip quotes and commas from start and end
             element = element.replace(/^\"/, '');
             element = element.replace(/[\"|,]*$/, '');
+            // @Mstep [] push the formatted line to indices array wrapped in quotes
             indices.push(`"${element}"`);
         }
     });
+    // console.log("Indices:", indices);
 
+    // @Mstep [] Get configuration for line wrapping
     const enableLineWrap = getConfigValue('linesToStringArray.wrapLines', true);
     const max_line_length = getConfigValue('linesToStringArray.maxLineLength', 80);
 
+    // @Mstep [IF] If line wrapping is disabled, output single line array
     if (!enableLineWrap) {
         let range = new vscode.Range(0, 0, editor.document.lineCount, 0);
         var output_string = `[${indices.join(', ')}]`;
         const workEdits = new vscode.WorkspaceEdit();
         workEdits.set(document.uri, [vscode.TextEdit.replace(range, output_string)]);
         vscode.workspace.applyEdit(workEdits);
+        // @Mstep [RETURN] Exit function
         return;
     }
 
 
     // var max_line_length = 80;
+    /**
+     * Contains an array of line arrays
+     */
     var line_arrays = []
 
     let current_line = [];
+    // @Mstep [LOOP] iterate through each term in indices
     for (let i = 0; i < indices.length; i++) {
         // @Mstep [] Calculate the length of this term plus commas and spaces
         let term_length = indices[i].length + 2;
+        // @Mstep [] calculate the current line length if this term is added
         let current_line_length = current_line.join(', ').length;
 
+        // @Mstep [IF] if adding this term exceeds the max line length
         if (current_line_length + term_length > max_line_length) {
-            // If adding this term exceeds the max line length, push the current line and start a new one
-            // let new_line = current_line.join(',');
+            // @Mstep [] Push the current line to line_arrays
             line_arrays.push(current_line);
-            // lines.push('\n');
+            // @Mstep [] Start a new current line with this term
             current_line = [indices[i]];
-        } else {
-            // Otherwise, add the term to the current line
+        } 
+        // @Mstep [ELSE] if the term fits in the current line
+        else {
+            // @Mstep [] Add the term to the current line
             current_line.push(indices[i]);
         }
     }
+    // @Mstep [] After loop, push any remaining terms in current_line to line_arrays
+    if (current_line.length > 0) {
+        line_arrays.push(current_line);
+    }
+    // console.log("line Arrays before final push:", line_arrays);
     var lines = [];
+    // @Mstep [LOOP] iterate through each line array
     for (let j = 0; j < line_arrays.length; j++) {
+        // @Mstep [] Join the line array into a single line string
         let new_line = line_arrays[j].join(', ');
-        // if this is the last line, don't add a comma at the end
-        // if (j === line_arrays.length - 1) {
-        //     lines.push(new_line+'\n');
-        //     continue;
-        // }
+        // @Mstep [] Push the line string to lines with a special delimiter for new lines
         lines.push(new_line+'__NEW_KFBR392_LINE__');
     }
 
@@ -106,9 +124,11 @@ async function linesToStringArray() {
 async function linesToFormattedArray() {
     const editor = vscode.window.activeTextEditor;
     if (!editor) return;
-    
+
     let document = editor.document;
     const config = vscode.workspace.getConfiguration('colemenutils');
+    // const enableLineWrap = getConfigValue('linesToStringArray.wrapLines', true);
+    // const max_line_length = getConfigValue('linesToStringArray.maxLineLength', 80);
 
     var d = fileOrSelectionToArrayOfLines(editor, true);
     if (d == null) return;
@@ -151,7 +171,7 @@ async function linesToFormattedArray() {
 async function linesToArray() {
     const editor = vscode.window.activeTextEditor;
     if (!editor) return;
-    
+
     let document = editor.document;
     const documentText = document.getText();
 
