@@ -19,6 +19,7 @@ const { registerJsonCommands } = require('./commands/jsonCommands');
 const { registerTodoCodeLens } = require('./commands/todoCodeLens');
 const { registerDebugCommands } = require('./commands/debugCommands');
 const { registerToggleCopilot } = require('./commands/toggleCopilot');
+const { registerTodoViewProvider } = require("./todo/TodoViewProvider");
 // const { registerAutoRenameTag } = require('./commands/autoRenameTag');
 // const { registerFileDecorations } = require('./commands/fileDecorationProvider');
 const { registerMstep } = require('./commands/mstep');
@@ -71,6 +72,12 @@ function activate(context) {
     registerMstep(context);
 	// context.subscriptions.push(vscode.window.registerFileDecorationProvider(new ColemenFileDecorationProvider()));
 	// registerAutoRenameTag(context);
+	registerTodoViewProvider(context);
+
+
+
+
+
 
 }
 
