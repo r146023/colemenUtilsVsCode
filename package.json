@@ -3,7 +3,7 @@
 	"displayName": "ColemenUtils",
 	"description": "Comprehensive utility extension for text formatting and productivity",
 	"publisher": "colemen",
-	"version": "0.0.8",
+	"version": "0.0.13",
 	"target": "es2020",
 	"lib":["es2020"],
 	"module": "commonjs",
@@ -23,12 +23,32 @@
 	],
 	"activationEvents": [
 		"*",
-		"onCommand:colemenutils.helloWorld"
+		"onCommand:colemenutils.helloWorld",
+		"onView:myext-todos-view"
 	],
 	"main": "./extension.js",
 	"contributes": {
+		"viewsContainers": {
+			"activitybar": [
+				{
+					"id": "myext-todos-container",
+					"title": "Todos",
+					"icon": "resources/todo.svg"
+				}
+			]
+		},
+		"views": {
+			"myext-todos-container": [
+				{
+				"id": "myext-todos-view",
+				"name": "Workspace Todos",
+				"type": "webview",
+				"icon": "resources/todo.svg"
+				}
+			]
+		},
 		"commands": [
-			
+
 			{
 				"command": "colemenutils.toggleBracketColorizer",
 				"title": "Toggle Bracket Colorizer",
@@ -122,6 +142,11 @@
 				"category": "SVG"
 			},
 			{
+				"command": "colemenutils.SVGPropsToJSX",
+				"title": "SVG Props to JSX",
+				"category": "SVG"
+			},
+			{
 				"command": "colemenutils.addMarkdownHeader",
 				"title": "Add Markdown Header"
 			},
@@ -202,6 +227,10 @@
 			{
 				"command": "colemenutils.shuffleLines",
 				"title": "Shuffle Lines"
+			},
+			{
+				"command": "colemenutils.reverseLines",
+				"title": "Colemen: Reverse Lines"
 			},
 			{
 				"command": "colemenutils.stripDuplicateLines",
@@ -338,6 +367,16 @@
                 "category": "ColemenUtils JSON"
             },
 			{
+				"command": "colemenutils.formatActiveDocument",
+				"title": "Format Active Document",
+				"category": "ColemenUtils Format"
+			},
+			{
+				"command": "colemenutils.insertSequence",
+				"title": "Insert Sequence",
+				"category": "ColemenUtils:"
+			},
+			{
 				"command": "colemenutils.typeScriptToJSON",
 				"title": "TypeScript to JSON",
 				"category": "ColemenUtils JSON"
@@ -393,13 +432,13 @@
 				"category": "ColemenUtils Tags"
 			},
 			{
-				"command": "colemenutils.disableAutoRenameTag", 
+				"command": "colemenutils.disableAutoRenameTag",
 				"title": "Disable Auto Rename Tag",
 				"category": "ColemenUtils Tags"
 			},
 			{
 				"command": "colemenutils.toggleAutoRenameTag",
-				"title": "Toggle Auto Rename Tag", 
+				"title": "Toggle Auto Rename Tag",
 				"category": "ColemenUtils Tags"
 			},
 			{
@@ -451,6 +490,11 @@
 			{
 				"key": "shift+delete",
 				"command": "colemenutils.deleteCurrentLine",
+				"when": "editorTextFocus && (isWindows || isLinux)"
+			},
+			{
+				"key": "ctrl+tab",
+				"command": "colemenutils.indentSelectedLines",
 				"when": "editorTextFocus && (isWindows || isLinux)"
 			},
 			{
@@ -518,15 +562,7 @@
 					]
 				}
 			},
-			{
-				"key": "ctrl+tab",
-				"command": "runCommands",
-				"args": {
-					"commands": [
-						"editor.action.nextSelectionMatchFindAction"
-					]
-				}
-			},
+
 			{
 				"key": "ctrl+shift+down",
 				"command": "runCommands",
@@ -618,6 +654,67 @@
 						"type": "number",
 						"default": 2,
 						"description": "Number of spaces for JSON indentation"
+					}
+				}
+			},
+			{
+				"title": "Colemen Utils Mstep Highlighting",
+				"properties": {
+					"colemenutils.mstepHighlighting.tagColors": {
+					"type": "object",
+					"default": {
+						"EVENT": [null, "#b488ff6e"],
+						"IF": ["#e4f3a0", "#4e5a18"],
+						"LOOP": ["#d0bfff", "#4e2c85"],
+						"ELSE": ["#adb5bd", "#6c757d"],
+						"RETURN": ["#dd7db2", "#701e4b"],
+						"EVENT-CLICK": ["#5b97af", "#1f5a72"],
+						"": ["#c09cff", "#6e42c171"]
+					},
+					"description": "Map of Mstep tag -> [foregroundColor, backgroundColor]. Foreground can be null to use editor default. Keys are case-insensitive at runtime.",
+					"additionalProperties": {
+						"anyOf": [
+						{
+							"type": "array",
+							"minItems": 2,
+							"maxItems": 2,
+							"items": [
+							{
+								"anyOf": [
+								{ "type": "string", "pattern": "^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$" },
+								{ "type": "null" }
+								],
+								"description": "Foreground color"
+							},
+							{
+								"type": "string",
+								"pattern": "^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$",
+								"description": "Background color"
+							}
+							]
+						},
+						{
+							"type": "object",
+							"required": ["bg"],
+							"properties": {
+							"fg": {
+								"anyOf": [
+								{ "type": "string", "pattern": "^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$" },
+								{ "type": "null" }
+								],
+								"description": "Foreground color"
+							},
+							"bg": {
+								"type": "string",
+								"pattern": "^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$",
+								"description": "Background color"
+							}
+							},
+							"additionalProperties": false,
+							"description": "Alternative object form: { fg, bg }"
+						}
+						]
+					}
 					}
 				}
 			},
@@ -803,59 +900,155 @@
 
 			}},
 			{
-			"title": "General Settings",
-			"properties": {
-				"colemenutils.linesToListDelimiter": {
-					"type": "string",
-					"default": ",",
-					"description": "The delimiter to use when converting lines to a list.",
-					"markdownDescription": "The delimiter to use when converting lines to a list. This is used in the `linesToList` command."
-				},
-				"colemenutils.toArrayQuoteCharacter": {
-					"type": "string",
-					"default": "'",
-					"enum": [
-						"\"",
-						"'"
-					],
-					"enumDescriptions": [
-						"Single quotes",
-						"Double quotes"
-					],
+				"title": "Line Width Settings",
+				"properties": {
 
-					"description": "The quote character to use when converting lines to an array.",
-					"markdownDescription": "The quote character to use when converting lines to an array. This is used in the `linesToArray` command.",
-					"tags": ["ColemenUtils","Array", "Quote", "Character"],
-					"title": "Array Quote Character"
-
-				},
-				"colemenutils.showSelectedLinesStatus": {
-					"type": "boolean",
-					"default": true,
-					"description": "Show the number of selected lines in the status bar."
-				},
-				"colemenutils.headerWidth": {
-					"type": "number",
-					"default": 80,
-					"description": "Width of the generated header block."
-				},
-				"colemenutils.defaultHashAlgo": {
-					"type": "string",
-					"default": "MD5",
-					"description": "The default hash algorithm to use for hashing. Options are: MD5, SHA1, SHA256, SHA512.",
-					"enum":[
-						"MD5",
-						"SHA1",
-						"SHA256",
-						"SHA512"
-					]
-				},
-				"colemenutils.bannerFont": {
-					"type": "string",
-					"default": "Banner",
-					"description": "Font to use for ASCII banners."
+					"colemenutils.lineWidthIndicatorHighlightBackgroundColor": {
+						"type": "string",
+						"default": "#ff730022",
+						"description": "Background color for line width indicator highlight when the line exceeds the specified length (CSS color value)."
+					},
+					"colemenutils.lineWidthIndicatorHighlightForegroundColor": {
+						"type": "string",
+						"default": "#ff7b00",
+						"description": "Foreground color color for line width indicator highlight when the line exceeds the specified length (CSS color value)."
+					},
+					"colemenutils.lineWidthIndicatorLength": {
+						"type": "number",
+						"default": 100,
+						"description": "The maximum line length before the line width indicator shows a negative number."
+					},
+					"colemenutils.lineWidthIndicatorShowTotalLength": {
+						"type": "boolean",
+						"default": false,
+						"description": "Show the total line length in the line width indicator instead of the number of characters over the limit. This can be easier to understand for some users."
+					},
+					"colemenutils.lineWidthIndicatorHighlightEnabled": {
+						"type": "boolean",
+						"default": false,
+						"description": "Highlight the line when it exceeds the `lineWidthIndicatorLength` limit. The highlight color is determined by the `lineWidthIndicatorHighlightColor` setting."
+					},
+					"colemenutils.lineWidthIndicatorShowLimit": {
+						"type": "number",
+						"default": 60,
+						"description": "The line length at which to start showing the line width indicator. This can be the same as `lineWidthIndicatorLength` or lower for a more gradual warning."
+					}
 				}
-			}}
+			},
+			{
+				"title": "Indentation Rainbow Settings",
+				"properties": {
+
+					"colemenutils.indentRainbowEnabled": {
+						"type": "boolean",
+						"default": true,
+						"description": "Enable rainbow indentation guides"
+					},
+					"colemenutils.indentRainbowIgnoreEmptyLines": {
+						"type": "boolean",
+						"default": true,
+						"description": "Ignore empty lines when applying rainbow indentation guides"
+					},
+					"colemenutils.indentRainbowMaxDepth": {
+						"type": "number",
+						"default": 24,
+						"description": "Maximum indentation depth to apply rainbow colors to"
+					},
+					"colemenutils.indentRainbowUseVisibleRangesOnly": {
+						"type": "boolean",
+						"default": true,
+						"description": "Only apply rainbow indentation guides to visible ranges in the editor for better performance"
+					},
+					"colemenutils.indentRainbowPalette": {
+						"type": "array",
+						"default": [
+							"#b700ff0d",
+							"#00a2ff22",
+							"#15ff000d",
+							"#ffee0022",
+							"#ff7b000d",
+							"#ff000033"
+						],
+						"description": "Color palette for rainbow indentation guides (CSS color values). Colors will be applied in order and cycled through for deeper levels of indentation."
+					},
+					"colemenutils.indentRainbowStyle": {
+						"type": "string",
+						"default": "background",
+						"enum": [
+							"background",
+							"border"
+						],
+						"enumDescriptions": [
+							"Color the background of the indent guides",
+							"Color the border of the indent guides"
+						],
+						"description": "Style for rainbow indentation guides"
+					}
+				}
+			},
+
+			{
+				"title": "General Settings",
+				"properties": {
+					"colemenutils.linesToListDelimiter": {
+						"type": "string",
+						"default": ",",
+						"description": "The delimiter to use when converting lines to a list.",
+						"markdownDescription": "The delimiter to use when converting lines to a list. This is used in the `linesToList` command."
+					},
+					"colemenutils.toArrayQuoteCharacter": {
+						"type": "string",
+						"default": "'",
+						"enum": [
+							"\"",
+							"'"
+						],
+						"enumDescriptions": [
+							"Single quotes",
+							"Double quotes"
+						],
+
+						"description": "The quote character to use when converting lines to an array.",
+						"markdownDescription": "The quote character to use when converting lines to an array. This is used in the `linesToArray` command.",
+						"tags": ["ColemenUtils","Array", "Quote", "Character"],
+						"title": "Array Quote Character"
+
+					},
+					"colemenutils.showSelectedLinesStatus": {
+						"type": "boolean",
+						"default": true,
+						"description": "Show the number of selected lines in the status bar."
+					},
+					"colemenutils.headerWidth": {
+						"type": "number",
+						"default": 80,
+						"description": "Width of the generated header block."
+					},
+					"colemenutils.defaultHashAlgo": {
+						"type": "string",
+						"default": "MD5",
+						"description": "The default hash algorithm to use for hashing. Options are: MD5, SHA1, SHA256, SHA512.",
+						"enum":[
+							"MD5",
+							"SHA1",
+							"SHA256",
+							"SHA512"
+						]
+					},
+					"colemenutils.bannerFont": {
+						"type": "string",
+						"default": "Banner",
+						"description": "Font to use for ASCII banners."
+					},
+					"colemenutils.colorPickerLanguages": {
+						"type": "array",
+						"default": [],
+						"description": "If provided, only show the color picker in these languages (identified by language ID). If empty, the color picker will be shown in all languages that support it."
+					}
+
+				}
+			}
+
 		],
 		"menus": {
 			"editor/context": [
@@ -939,6 +1132,11 @@
 					"command": "colemenutils.shuffleLines",
 					"when": "editorHasSelection == false && editorTextFocus",
 					"group": "1_main"
+				},
+				{
+					"command": "colemenutils.reverseLines",
+					"when": "editorHasSelection == false && editorTextFocus",
+					"group": "1_main"
 				}
 			],
 			"colemenutils.contextHashSubmenu": [
@@ -970,6 +1168,10 @@
 				},
 				{
 					"command": "colemenutils.CaptureSVGViewboxValue",
+					"group": "1_main"
+				},
+				{
+					"command": "colemenutils.SVGPropsToJSX",
 					"group": "1_main"
 				}
 			],
