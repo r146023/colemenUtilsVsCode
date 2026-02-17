@@ -18,6 +18,8 @@ function registerEditorCommands(context) {
         vscode.commands.registerCommand('colemenutils.copyCurrentLine', copyCurrentLine),
         vscode.commands.registerCommand('colemenutils.deleteCurrentLine', deleteCurrentLine),
         vscode.commands.registerCommand('colemenutils.cutCurrentLine', cutCurrentLine),
+        vscode.commands.registerCommand('colemenutils.formatActiveDocument', formatActiveDocument),
+        vscode.commands.registerCommand('colemenutils.insertSequence', vsSequentialNumber),
     );
 }
 
@@ -166,6 +168,173 @@ async function insertUUIDs() {
         }
     });
 }
+
+async function formatActiveDocument() {
+    const editor = vscode.window.activeTextEditor;
+    if (!editor) return;
+
+    const document = editor.document;
+
+    // Normalize editor options to primitive types expected by format providers
+    const tabSize = Number(editor.options.tabSize) || 4;
+    const insertSpaces = editor.options.insertSpaces === true || editor.options.insertSpaces === 'true';
+
+    // executeCommand is asynchronous and JS does not support TypeScript generics here
+    const edits = await vscode.commands.executeCommand(
+        'vscode.executeFormatDocumentProvider',
+        document.uri,
+        { tabSize, insertSpaces }
+    );
+
+    // Ensure edits is an array before accessing length to satisfy the type checker
+    if (!Array.isArray(edits) || edits.length === 0) return;
+
+    /** @type {import('vscode').TextEdit[]} */
+    const textEdits = edits;
+
+    const workspaceEdit = new vscode.WorkspaceEdit();
+    workspaceEdit.set(document.uri, textEdits);
+
+    await vscode.workspace.applyEdit(workspaceEdit);
+}
+
+
+
+
+async function vsSequentialNumber() {
+    const editor = vscode.window.activeTextEditor;
+    if (!editor) return;
+
+    const doc = editor.document;
+    const selections = editor.selections || [];
+    if (selections.length === 0) return;
+
+    // VS Sequential Number syntax: "<start> <operator?> <step?>"
+    // Defaults: start=1, operator="+", step=1 :contentReference[oaicite:5]{index=5}
+    const input = await vscode.window.showInputBox({
+        title: "VS Sequential Number",
+        prompt: "Syntax: <start> <operator?> <step?>   (defaults: 1 + 1)",
+        placeHolder: "Example: 1 + 1   |   10 - 2   |   1 * 2   |   100 / 5",
+        value: "1 + 1",
+        ignoreFocusOut: true,
+        validateInput: (value) => {
+            const parsed = parseSequenceSpec(value);
+            if (!parsed.ok) return parsed.error;
+
+            // Basic guard: division by zero
+            if (parsed.operator === "/" && parsed.step === 0) return "Step cannot be 0 for division.";
+            return null;
+        }
+    });
+
+    if (input == null) return; // cancelled
+
+    const parsed = parseSequenceSpec(input);
+    if (!parsed.ok) {
+        vscode.window.showErrorMessage(parsed.error);
+        return;
+    }
+
+    let current = parsed.start;
+    const op = parsed.operator;
+    const step = parsed.step;
+
+    // 1) Assign numbers in DOCUMENT order (top-to-bottom / left-to-right)
+    const ordered = selections
+        .map((sel, idx) => ({ sel, idx }))
+        .sort((a, b) => comparePositions(minPos(a.sel), minPos(b.sel)));
+
+    const planned = [];
+    for (const item of ordered) {
+        planned.push({
+            sel: item.sel,
+            text: String(current)
+        });
+        current = applyOperator(current, op, step);
+    }
+
+    // 2) Apply edits in REVERSE document order so earlier edits don't shift later ranges
+    const plannedReverse = planned
+        .slice()
+        .sort((a, b) => comparePositions(minPos(b.sel), minPos(a.sel)));
+
+    await editor.edit((editBuilder) => {
+        for (const p of plannedReverse) {
+            if (p.sel.isEmpty) {
+                // Insert at caret
+                editBuilder.insert(p.sel.active, p.text);
+            } else {
+                // Replace selection
+                editBuilder.replace(p.sel, p.text);
+            }
+        }
+    }, { undoStopBefore: true, undoStopAfter: true });
+}
+
+/**
+ * Parses "<start> <operator?> <step?>"
+ * Robustly supports:
+ *  - "10 + 2"
+ *  - "10+2"
+ *  - "10" (=> 10 + 1)
+ */
+function parseSequenceSpec(raw) {
+    const s = String(raw || "").trim();
+
+    // Defaults: 1 + 1 :contentReference[oaicite:6]{index=6}
+    if (!s) {
+        return { ok: true, start: 1, operator: "+", step: 1 };
+    }
+
+    // Allow optional spaces around operator; allow no operator/step
+    const m = s.match(/^(-?\d+)\s*([+\-*/])?\s*(-?\d+)?$/);
+    if (!m) {
+        return {
+            ok: false,
+            error: "Invalid format. Use: <start> <operator?> <step?>   e.g. '1 + 1' or '10-2'."
+        };
+    }
+
+    const start = parseInt(m[1], 10);
+    const operator = (m[2] || "+");
+    const step = (m[3] == null || m[3] === "") ? 1 : parseInt(m[3], 10);
+
+    if (!Number.isFinite(start)) return { ok: false, error: "Start must be an integer." };
+    if (!["+", "-", "*", "/"].includes(operator)) return { ok: false, error: "Operator must be one of + - * /." };
+    if (!Number.isFinite(step)) return { ok: false, error: "Step must be an integer." };
+
+    return { ok: true, start, operator, step };
+}
+
+function applyOperator(value, operator, step) {
+    switch (operator) {
+        case "+": return value + step;
+        case "-": return value - step;
+        case "*": return value * step;
+        // spec says integer inputs; extension allows '/' :contentReference[oaicite:7]{index=7}
+        case "/": return value / step; 
+        default: return value + step;
+    }
+}
+
+function minPos(sel) {
+    // Selection start can be after end depending on direction; normalize
+    return sel.start.isBefore(sel.end) ? sel.start : sel.end;
+}
+
+function comparePositions(a, b) {
+    if (a.line !== b.line) return a.line - b.line;
+    return a.character - b.character;
+}
+
+
+
+
+
+
+
+
+
 
 
 module.exports = {
