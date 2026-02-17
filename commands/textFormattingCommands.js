@@ -28,7 +28,10 @@ function registerTextFormattingCommands(context) {
         vscode.commands.registerCommand('colemenutils.indentSelectedLines', indentSelectedLines)
     );
 }
-// TODO []: (javascript,frontend,textFormatting) Command that indents all selected lines (by moving cursor to start)
+// XXX [2026-02-04 11:42:27]: (javascript,frontend,textFormatting) Command that indents all selected lines (by moving cursor to start)
+
+// TODO []: (javascript,frontend,textFormatting) Command that sets indentation of all selected lines to the lowest indentation level among them. 
+
 
 /**
  * Remove entire lines that start with a hyphen (optionally leading spaces)
