@@ -69,47 +69,96 @@ function generateUUIDv4() {
     });
 }
 
-function matchCasing(original, replacement) {
-    if (!original) return replacement;
 
-    // ALL UPPERCASE
-    if (original === original.toUpperCase()) {
-        return replacement.toUpperCase();
-    }
-    // all lowercase
-    if (original === original.toLowerCase()) {
-        return replacement.toLowerCase();
-    }
-    // Title Case (First letter uppercase, rest lowercase)
-    if (
-        original[0] === original[0].toUpperCase() &&
-        original.slice(1) === original.slice(1).toLowerCase()
-    ) {
-        return replacement[0].toUpperCase() + replacement.slice(1).toLowerCase();
-    }
-    // snake_case
-    if (/^[a-z0-9_]+$/.test(original) && original.includes('_')) {
-        return replacement
-            .replace(/([A-Z])/g, '_$1') // handle camelCase/PascalCase input
-            .replace(/[\s\-]+/g, '_')   // spaces/dashes to underscores
-            .toLowerCase();
-    }
-    // PascalCase
-    if (/^[A-Z][a-z0-9]+(?:[A-Z][a-z0-9]+)*$/.test(original)) {
-        return replacement
-            .replace(/[_\-\s]+(.)?/g, (_, c) => c ? c.toUpperCase() : '')
-            .replace(/^(.)/, (m) => m.toUpperCase());
-    }
-    // camelCase
-    if (/^[a-z][a-z0-9]+(?:[A-Z][a-z0-9]+)*$/.test(original)) {
-        let pascal = replacement
-            .replace(/[_\-\s]+(.)?/g, (_, c) => c ? c.toUpperCase() : '')
-            .replace(/^(.)/, (m) => m.toUpperCase());
-        return pascal[0].toLowerCase() + pascal.slice(1);
-    }
-    // fallback: return as-is
-    return replacement;
+/**
+ * Match casing of inserted text to the casing of original text.
+ * Keep this conservative: if we're unsure, don't change anything.
+ */
+function matchCasing(original, inserted) {
+    if (!original || original.length === 0) return inserted;
+
+    // If original has no letters, casing intent is unclear.
+    if (!/[A-Za-z]/.test(original)) return inserted;
+
+    const isAllUpper = original === original.toUpperCase();
+    const isAllLower = original === original.toLowerCase();
+    const isTitle = original.length >= 1 && original[0] === original[0].toUpperCase() && original.slice(1) === original.slice(1).toLowerCase();
+
+    if (isAllUpper) return inserted.toUpperCase();
+    if (isAllLower) return inserted.toLowerCase();
+    if (isTitle) return toTitleCasePreserveNonLetters(inserted);
+
+    // Mixed/unknown casing (camelCase, PascalCase, snake_case with mixed segments, etc.)
+    // Being aggressive here causes the “lowercase entire string” bug you mentioned.
+    return inserted;
 }
+
+
+function toTitleCasePreserveNonLetters(s) {
+    if (!s) return s;
+    // Title-case only the first alphabetic character, lowercase subsequent alphabetics.
+    let foundFirstAlpha = false;
+    let out = "";
+
+    for (let i = 0; i < s.length; i++) {
+        const ch = s[i];
+        if (/[A-Za-z]/.test(ch)) {
+            if (!foundFirstAlpha) {
+                out += ch.toUpperCase();
+                foundFirstAlpha = true;
+            } else {
+                out += ch.toLowerCase();
+            }
+        } else {
+            out += ch;
+        }
+    }
+    return out;
+}
+
+
+
+// function matchCasing(original, replacement) {
+//     if (!original) return replacement;
+
+//     // ALL UPPERCASE
+//     if (original === original.toUpperCase()) {
+//         return replacement.toUpperCase();
+//     }
+//     // all lowercase
+//     if (original === original.toLowerCase()) {
+//         return replacement.toLowerCase();
+//     }
+//     // Title Case (First letter uppercase, rest lowercase)
+//     if (
+//         original[0] === original[0].toUpperCase() &&
+//         original.slice(1) === original.slice(1).toLowerCase()
+//     ) {
+//         return replacement[0].toUpperCase() + replacement.slice(1).toLowerCase();
+//     }
+//     // snake_case
+//     if (/^[a-z0-9_]+$/.test(original) && original.includes('_')) {
+//         return replacement
+//             .replace(/([A-Z])/g, '_$1') // handle camelCase/PascalCase input
+//             .replace(/[\s\-]+/g, '_')   // spaces/dashes to underscores
+//             .toLowerCase();
+//     }
+//     // PascalCase
+//     if (/^[A-Z][a-z0-9]+(?:[A-Z][a-z0-9]+)*$/.test(original)) {
+//         return replacement
+//             .replace(/[_\-\s]+(.)?/g, (_, c) => c ? c.toUpperCase() : '')
+//             .replace(/^(.)/, (m) => m.toUpperCase());
+//     }
+//     // camelCase
+//     if (/^[a-z][a-z0-9]+(?:[A-Z][a-z0-9]+)*$/.test(original)) {
+//         let pascal = replacement
+//             .replace(/[_\-\s]+(.)?/g, (_, c) => c ? c.toUpperCase() : '')
+//             .replace(/^(.)/, (m) => m.toUpperCase());
+//         return pascal[0].toLowerCase() + pascal.slice(1);
+//     }
+//     // fallback: return as-is
+//     return replacement;
+// }
 
 /**
  * Determine whether the given editor contains at least one non-empty selection.
