@@ -3,10 +3,11 @@ const { getConfigValue } = require("../helpers/configHelpers");
 
 /**
  * "vscode-color-picker" clone behavior, but with a better default:
- * - If `colorpickerlanguages` is EMPTY or missing -> enable everywhere (scheme-based).
+ * - If `colorPickerLanguages` (or legacy `colorpickerlanguages`) is EMPTY -> enable "everywhere"
+ *   BUT skip languages that already have a native color provider (to avoid duplicate swatches).
  * - If it's a non-empty array -> enable only for those language IDs (like the original extension).
  *
- * Color formats supported:
+ * Supported formats:
  *   #rgb #rgba #rrggbb #rrggbbaa
  *   rgb(r,g,b) rgba(r,g,b,a)
  *   hsl(h,s%,l%) hsla(h,s%,l%,a)
@@ -20,15 +21,18 @@ function activateVscodeColorPickerDecorator(context) {
 
   context.subscriptions.push(
     vscode.workspace.onDidChangeConfiguration((e) => {
-      // Re-register on ANY config change because:
-      // - scheme registration vs language list can flip
-      // - users may change languages array or extension settings
+      // Re-register if our config changes.
       if (
+        e.affectsConfiguration("colorPickerLanguages") ||
         e.affectsConfiguration("colorpickerlanguages") ||
+        e.affectsConfiguration("colorPickerExcludeLanguages") ||
         e.affectsConfiguration("vscode-color-picker") ||
-        e.affectsConfiguration("colemenutils.vscodeColorPicker") // if you ever mirror keys
+        e.affectsConfiguration("colemenutils.vscodeColorPicker")
       ) {
         controller.refreshRegistrations();
+      } else {
+        // Even if config didn't change, provider behavior may depend on languageId exclusions.
+        // Being safe: refresh if unknown. (But avoid too much churn.)
       }
     })
   );
@@ -54,39 +58,58 @@ class VscodeColorPickerController {
   refreshRegistrations() {
     if (this._disposed) return;
 
-    // Read the original extension key
-    const langsRaw = getConfigValue("colorPickerLanguages", []);
+    // Support both the new key and the legacy typo key found in your file. :contentReference[oaicite:1]{index=1}
+    const langsRawPrimary = getConfigValue("colorPickerLanguages", undefined);
+    const langsRawLegacy = getConfigValue("colorpickerlanguages", undefined);
+
+    const langsRaw =
+      langsRawPrimary !== undefined ? langsRawPrimary :
+      langsRawLegacy !== undefined ? langsRawLegacy :
+      [];
+
     const languageIds = Array.isArray(langsRaw)
       ? langsRaw.map((x) => String(x || "").trim()).filter(Boolean)
       : [];
 
+    const excludeRaw = getConfigValue("colorPickerExcludeLanguages", defaultExcludedLanguages());
+    const excludeLanguages = Array.isArray(excludeRaw)
+      ? new Set(excludeRaw.map((x) => String(x || "").trim()).filter(Boolean))
+      : new Set(defaultExcludedLanguages());
+
     // Decide mode:
-    // - empty list => global (scheme-based)
-    // - non-empty => per-language
+    // - empty list => global (scheme-based) but exclude built-in provider languages
+    // - non-empty => explicit per-language mode (no exclude unless user chooses)
     const modeKey =
       languageIds.length === 0
-        ? "mode:global:file+untitled"
-        : `mode:languages:${languageIds.sort().join("|")}`;
+        ? `mode:global:file+untitled:exclude:${Array.from(excludeLanguages).sort().join("|")}`
+        : `mode:languages:${languageIds.slice().sort().join("|")}`;
 
-    if (modeKey === this._modeCacheKey) return; // no-op
+    if (modeKey === this._modeCacheKey) return;
     this._modeCacheKey = modeKey;
 
     this._disposeRegistrations();
 
-    const provider = new ColorProvider(this._tokenCache);
+    const provider = new ColorProvider(this._tokenCache, {
+      mode: languageIds.length === 0 ? "global" : "explicit",
+      excludeLanguages,
+    });
 
     if (languageIds.length === 0) {
-      // ✅ Default: work everywhere
-      // file + untitled covers most editors; add "vscode-userdata" if you want settings UI too.
+      // ✅ Global default: works everywhere, but provider skips excluded languages
       this._registrations.push(
-        vscode.languages.registerColorProvider([{ scheme: "file" }, { scheme: "untitled" }], provider)
+        vscode.languages.registerColorProvider(
+          [{ scheme: "file" }, { scheme: "untitled" }],
+          provider
+        )
       );
       return;
     }
 
-    // 🔒 Explicit languages list (matches original extension pattern)
+    // 🔒 Explicit languages list (original extension behavior)
     for (const langId of languageIds) {
-      this._registrations.push(vscode.languages.registerColorProvider({ language: langId }, provider));
+      this._registrations.push(
+        vscode.languages.registerColorProvider({ language: langId }, provider)
+      );
     }
   }
 
@@ -94,28 +117,37 @@ class VscodeColorPickerController {
     for (const d of this._registrations) {
       try {
         d.dispose();
-      } catch(e) {}
+      } catch (e) {}
     }
     this._registrations = [];
   }
 }
 
 class ColorProvider {
-  constructor(tokenCache) {
+  constructor(tokenCache, opts) {
     this._tokenCache = tokenCache;
+    this._mode = opts.mode || "global";
+    this._excludeLanguages = opts.excludeLanguages || new Set();
   }
 
-  provideDocumentColors(document, token) {
+  provideDocumentColors(document) {
+    // In global mode, skip languages that already have a native provider
+    // to prevent duplicate swatches (your screenshot symptom).
+    if (this._mode === "global" && this._excludeLanguages.has(document.languageId)) {
+      // Clear token cache for this doc to avoid stale presentations
+      this._tokenCache.delete(document.uri.toString());
+      return [];
+    }
+
     const text = document.getText();
     const uriKey = document.uri.toString();
 
     const tokens = [];
     const infos = [];
 
-    // hex OR rgb/rgba OR hsl/hsla
     // Prefer 8/6/4/3 and prevent partial matches with (?![0-9a-fA-F])
     const re =
-    /(#(?:[0-9a-fA-F]{8}|[0-9a-fA-F]{6}|[0-9a-fA-F]{4}|[0-9a-fA-F]{3})(?![0-9a-fA-F]))|(\brgba?\(\s*[^)]*\))|(\bhsla?\(\s*[^)]*\))/g;
+      /(#(?:[0-9a-fA-F]{8}|[0-9a-fA-F]{6}|[0-9a-fA-F]{4}|[0-9a-fA-F]{3})(?![0-9a-fA-F]))|(\brgba?\(\s*[^)]*\))|(\bhsla?\(\s*[^)]*\))/g;
 
     let m;
     while ((m = re.exec(text)) !== null) {
@@ -140,8 +172,14 @@ class ColorProvider {
     return infos;
   }
 
-  provideColorPresentations(color, context, token) {
+  provideColorPresentations(color, context) {
     const doc = context.document;
+
+    // Same skip rule as above (global mode)
+    if (this._mode === "global" && this._excludeLanguages.has(doc.languageId)) {
+      return [];
+    }
+
     const uriKey = doc.uri.toString();
     const tokens = this._tokenCache.get(uriKey) || [];
 
@@ -155,6 +193,29 @@ class ColorProvider {
     // fallback
     return [new vscode.ColorPresentation(rgbaString(color))];
   }
+}
+
+/* -----------------------------
+   Exclusions
+------------------------------ */
+
+function defaultExcludedLanguages() {
+  // Languages where VS Code typically already provides color decorations/picker
+  // (exact set varies by installation, but this covers the common built-ins that cause duplicates).
+  return [
+    "css",
+    "scss",
+    "less",
+    "sass",
+    "postcss",
+    "stylus",
+    "html",
+    "svg",
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact",
+  ];
 }
 
 /* -----------------------------

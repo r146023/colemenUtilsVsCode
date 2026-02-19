@@ -25,7 +25,8 @@ function registerTextFormattingCommands(context) {
         vscode.commands.registerCommand('colemenutils.reverseSlashesInWindowsPaths', reverseSlashesInWindowsPaths),
         vscode.commands.registerCommand('colemenutils.normalizeBlankLines', normalizeBlankLines),
         vscode.commands.registerCommand('colemenutils.stripPlusAndHyphenLines', stripPlusAndHyphenLines),
-        vscode.commands.registerCommand('colemenutils.indentSelectedLines', indentSelectedLines)
+        vscode.commands.registerCommand('colemenutils.indentSelectedLines', indentSelectedLines),
+        vscode.commands.registerCommand('colemenutils.wrapComments', wrapComments),
     );
 }
 // XXX [2026-02-04 11:42:27]: (javascript,frontend,textFormatting) Command that indents all selected lines (by moving cursor to start)
@@ -430,6 +431,253 @@ async function normalizeBlankLines() {
         vscode.window.showErrorMessage('Failed to normalize blank lines');
     }
 }
+
+
+
+/**
+ * Register:
+ *   vscode.commands.registerCommand("wrapComments", wrapComments)
+ */
+async function wrapComments() {
+  const editor = vscode.window.activeTextEditor;
+  if (!editor) return;
+
+  const doc = editor.document;
+  const fullText = doc.getText();
+  const LIMIT = 100;
+
+  // Find C-style block comments: /* ... */
+  // Non-greedy, includes newlines.
+  const commentRe = /\/\*[\s\S]*?\*\//g;
+
+  const edits = [];
+  let match;
+
+  while ((match = commentRe.exec(fullText)) !== null) {
+    const startOffset = match.index;
+    const endOffset = startOffset + match[0].length;
+    const originalComment = match[0];
+
+    var replacement = wrapBlockComment(originalComment, LIMIT);
+    // replacement.replace(/\s*\*\s*(@[a-zA-Z0-9]*)/g,)
+
+
+    if (replacement !== originalComment) {
+      const range = new vscode.Range(doc.positionAt(startOffset), doc.positionAt(endOffset));
+      edits.push({ startOffset, range, replacement });
+    }
+  }
+
+  if (edits.length === 0) return;
+
+  // Apply edits back-to-front so offsets don't shift
+  edits.sort((a, b) => b.startOffset - a.startOffset);
+
+  await editor.edit(
+    (editBuilder) => {
+      for (const e of edits) {
+        editBuilder.replace(e.range, e.replacement);
+      }
+    },
+    { undoStopBefore: true, undoStopAfter: true }
+  );
+}
+
+/**
+ * Wraps the inner text of a block comment without breaking words.
+ * Preserves:
+ * - Opening and closing delimiters
+ * - Per-line indentation
+ * - Leading " * " prefixes (JSDoc style)
+ * - Blank lines
+ */
+function wrapBlockComment(block, limit) {
+  // Split preserving line endings as \n (VS Code uses \n in getText()).
+  const lines = block.split("\n");
+
+  if (lines.length === 1) {
+    // Single-line /* ... */ - do nothing (usually already short; wrapping here can be surprising)
+    return block;
+  }
+
+  // Detect comment indent from the first line
+  const firstLine = lines[0];
+  const _m = firstLine.match(/^\s*/);
+  const indent = (_m && _m[0]) ? _m[0] : "";
+
+  const isJSDoc = firstLine.trimStart().startsWith("/**");
+
+  // Extract open and close tokens
+  // Keep first line’s opening as-is (typically "/*" or "/**" maybe with text).
+  // Keep last line’s closing as-is (typically "*/" maybe with leading spaces).
+  const openLine = lines[0];
+  const closeLine = lines[lines.length - 1];
+
+  // Middle lines are where we wrap content
+  const middle = lines.slice(1, -1);
+
+  // Parse each middle line into:
+  // - prefix: indent + optional "*" + optional single space after "*"
+  // - content: rest of the text (trim-right preserved loosely)
+  const parsed = middle.map((line) => parseCommentMiddleLine(line, indent));
+
+  // Combine into paragraphs: consecutive non-blank content lines join; blank lines break paragraphs.
+  const wrappedMiddleLines = [];
+  let paragraphTokens = [];
+  let paragraphPrefix = null; // keep prefix from first line in paragraph
+
+  const flushParagraph = () => {
+    if (paragraphTokens.length === 0) return;
+
+    const prefix = (paragraphPrefix !== null && paragraphPrefix !== undefined) ? paragraphPrefix : indent;
+    const maxTextWidth = Math.max(10, limit - prefix.length*3); // avoid pathological too-small widths
+
+    const joined = paragraphTokens.join(" ").replace(/\s+/g, " ").trim();
+
+    if (joined.length === 0) {
+      wrappedMiddleLines.push(prefix.trimEnd());
+      paragraphTokens = [];
+      paragraphPrefix = null;
+      return;
+    }
+
+    const wrapped = wrapTextNoWordSplit(joined, maxTextWidth);
+
+    for (const w of wrapped) {
+        if(isJSDoc && !w.startsWith("*")) {
+            wrappedMiddleLines.push(prefix + "* " + w);
+            continue;
+        }
+
+      wrappedMiddleLines.push(prefix + w);
+    }
+
+    paragraphTokens = [];
+    paragraphPrefix = null;
+  };
+
+  for (const p of parsed) {
+    const isBlank = p.content.trim().length === 0;
+
+    if (isBlank) {
+      flushParagraph();
+      // Preserve blank comment line with its prefix (JSDoc keeps " *" lines)
+      // If the original had a star prefix, keep it.
+      wrappedMiddleLines.push(p.prefix.trimEnd());
+      continue;
+    }
+
+    if (paragraphTokens.length === 0) {
+      paragraphPrefix = p.prefix;
+    }
+
+    paragraphTokens.push(p.content.trim());
+  }
+
+  flushParagraph();
+//   var outMiddleLines = [];
+//   for (const line of wrappedMiddleLines) {
+//     line.replace(/(@[a-zA-Z0-9]*)/g,`__JSDOC_KEY__ * $1`);
+//     var lp = line.split("__JSDOC_KEY__")
+//     if (lp.length > 1) {
+//         outMiddleLines.concat(lp);
+//         continue;
+//     }
+//     else{
+//         outMiddleLines.push(line);
+//     }
+//     // outMiddleLines.push(line);
+//   }
+  // Rebuild:
+  // Keep the opening and closing lines as they were, unless you want to wrap text on them too.
+  // Most people expect only the body to be reflowed.
+  const rebuilt = [openLine, ...wrappedMiddleLines, closeLine].join("\n");
+
+  return rebuilt;
+}
+
+/**
+ * Determines the prefix (indent + optional " * ") and content for a middle block-comment line.
+ */
+function parseCommentMiddleLine(line, indent) {
+  // Preserve original indentation as much as possible, but normalize to doc indent if present.
+  const _m = line.match(/^\s*/);
+  const actualIndent = (_m && _m[0]) ? _m[0] : indent;
+
+  const afterIndent = line.slice(actualIndent.length);
+
+  // Common in JSDoc: " * text"
+  // Also allow "* text" with no leading space.
+  const starMatch = afterIndent.match(/^(\*?)(\s?)(.*)$/);
+
+  const hasStar = starMatch && starMatch[1] === "*";
+  const spaceAfterStar = starMatch && starMatch[2] ? starMatch[2] : "";
+
+  const content = starMatch ? starMatch[3] : afterIndent;
+
+  // If the original line had "*", keep " * " (or " *" if no space existed)
+  // If it didn't, prefix is just indent.
+  const prefix = hasStar
+    ? actualIndent + "*" + (spaceAfterStar || " ")
+    : actualIndent;
+
+  return { prefix, content: content != null ? content : "" };
+}
+
+
+/**
+ * Wrap text into lines with a maximum width, preferring whitespace breaks.
+ * Never splits words. If a single word exceeds width, it occupies a line by itself.
+ */
+function wrapTextNoWordSplit(text, width) {
+  const words = text.split(/\s+/).filter(Boolean);
+  const lines = [];
+  let current = "";
+
+  for (const w of words) {
+    if (current.length === 0) {
+      current = w;
+      continue;
+    }
+    // if (typeof w === "string"){
+    //     if (w.matchAll(/(@[a-zA-Z0-9]*)/gmi)){
+    //         // If the word contains JSDoc tags, we want to force each tag onto its own line to preserve readability, even if it exceeds the width limit.
+    //         const tags = w.split(/(@[a-zA-Z0-9]*)\s*[^\n\r]*/g).filter(Boolean);
+    //         for (const tag of tags) {
+    //             if (tag.startsWith("@")) {
+    //                 // If the tag itself exceeds the width, we still put it on its own line.
+    //                 if (current.length > 0) {
+    //                     lines.push(current);
+    //                     current = "";
+    //                 }
+    //                 lines.push(tag);
+    //             }
+    //             else {
+    //                 if (current.length + 1 + tag.length <= width) {
+    //                     current += " " + tag;
+    //                 } else {
+    //                     lines.push(current);
+    //                     current = tag;
+    //                 }
+    //             }
+    //         }
+    //         continue;
+    //     }
+    // }
+
+    if (current.length + 1 + w.length <= width) {
+      current += " " + w;
+    } else {
+      lines.push(current);
+      current = w;
+    }
+  }
+
+  if (current.length > 0) lines.push(current);
+
+  return lines;
+}
+
 
 
 /**

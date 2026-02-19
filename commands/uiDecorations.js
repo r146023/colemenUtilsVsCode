@@ -19,7 +19,7 @@ const {
  */
 function registerUiDecorations(context) {
     // Multi-cursor casing logic
-    context.subscriptions.push(vscode.workspace.onDidChangeTextDocument(handleMultiCursorCasing));
+    // context.subscriptions.push(vscode.workspace.onDidChangeTextDocument(handleMultiCursorCasing));
 
     // Trailing spaces highlighting
     context.subscriptions.push(vscode.window.onDidChangeActiveTextEditor(highlightTrailingSpaces), vscode.workspace.onDidChangeTextDocument(highlightTrailingSpaces), vscode.window.onDidChangeTextEditorSelection(highlightTrailingSpaces), vscode.workspace.onDidChangeConfiguration(onConfigurationChanged));
@@ -126,104 +126,104 @@ function registerDocumentSnapshots() {
  * - You MUST have snapshots enabled via registerDocumentSnapshots(), otherwise
  *   originalText cannot be known reliably.
  */
-async function handleMultiCursorCasing(event) {
-    const editor = vscode.window.activeTextEditor;
-    if (!editor) return;
+// async function handleMultiCursorCasing(event) {
+//     const editor = vscode.window.activeTextEditor;
+//     if (!editor) return;
 
-    const doc = event.document;
-    if (doc !== editor.document) return;
+//     const doc = event.document;
+//     if (doc !== editor.document) return;
 
-    // Only meaningful with multi-cursor (but contentChanges could still be >1 without it).
-    const selectionCount = editor && editor.selections ? editor.selections.length : 0;
-    if (selectionCount <= 1) {
-        // Still update snapshot at end.
-        _docSnapshots.set(doc.uri.toString(), doc.getText());
-        return;
-    }
+//     // Only meaningful with multi-cursor (but contentChanges could still be >1 without it).
+//     const selectionCount = editor && editor.selections ? editor.selections.length : 0;
+//     if (selectionCount <= 1) {
+//         // Still update snapshot at end.
+//         _docSnapshots.set(doc.uri.toString(), doc.getText());
+//         return;
+//     }
 
-    const uriKey = doc.uri.toString();
+//     const uriKey = doc.uri.toString();
 
-    // If this change was triggered by our own casing edits, ignore.
-    if (_isApplying.has(uriKey)) {
-        _docSnapshots.set(uriKey, doc.getText());
-        return;
-    }
+//     // If this change was triggered by our own casing edits, ignore.
+//     if (_isApplying.has(uriKey)) {
+//         _docSnapshots.set(uriKey, doc.getText());
+//         return;
+//     }
 
-    const beforeText = _docSnapshots.get(uriKey);
-    if (typeof beforeText !== "string") {
-        // Snapshot missing: bail safely and seed it for next time.
-        _docSnapshots.set(uriKey, doc.getText());
-        return;
-    }
+//     const beforeText = _docSnapshots.get(uriKey);
+//     if (typeof beforeText !== "string") {
+//         // Snapshot missing: bail safely and seed it for next time.
+//         _docSnapshots.set(uriKey, doc.getText());
+//         return;
+//     }
 
-    const changes = event.contentChanges;
-    if (!changes || changes.length === 0) {
-        _docSnapshots.set(uriKey, doc.getText());
-        return;
-    }
+//     const changes = event.contentChanges;
+//     if (!changes || changes.length === 0) {
+//         _docSnapshots.set(uriKey, doc.getText());
+//         return;
+//     }
 
-    // Build a list of casing fixes to apply in one transaction.
-    // We'll compute original text from beforeText using offsets + rangeLength.
-    const fixes = [];
+//     // Build a list of casing fixes to apply in one transaction.
+//     // We'll compute original text from beforeText using offsets + rangeLength.
+//     const fixes = [];
 
-    for (const change of changes) {
-        // Only process insertions (ignore pure deletions)
-        if (!change.text || change.text.length === 0) continue;
+//     for (const change of changes) {
+//         // Only process insertions (ignore pure deletions)
+//         if (!change.text || change.text.length === 0) continue;
 
-        // Offset in the document BEFORE the change (same start position)
-        const startOffsetBefore = doc.offsetAt(change.range.start);
+//         // Offset in the document BEFORE the change (same start position)
+//         const startOffsetBefore = doc.offsetAt(change.range.start);
 
-        // rangeLength is the length of replaced text in the document BEFORE the change.
-        const replacedLenBefore = typeof change.rangeLength === "number" ? change.rangeLength : 0;
+//         // rangeLength is the length of replaced text in the document BEFORE the change.
+//         const replacedLenBefore = typeof change.rangeLength === "number" ? change.rangeLength : 0;
 
-        // True original text (pre-change)
-        const originalText = beforeText.slice(startOffsetBefore, startOffsetBefore + replacedLenBefore);
+//         // True original text (pre-change)
+//         const originalText = beforeText.slice(startOffsetBefore, startOffsetBefore + replacedLenBefore);
 
-        // Decide casing based on what was replaced.
-        const insertedText = change.text;
-        const casedText = matchCasing(originalText, insertedText);
+//         // Decide casing based on what was replaced.
+//         const insertedText = change.text;
+//         const casedText = matchCasing(originalText, insertedText);
 
-        if (casedText !== insertedText) {
-            // We need to replace the *inserted* text in the document AFTER the change.
-            // Compute the end position using the AFTER document via positionAt(startOffset + insertedText.length)
-            // Note: startOffsetBefore corresponds to same position in AFTER doc start (change.range.start).
-            const startPosAfter = change.range.start;
-            const startOffsetAfter = doc.offsetAt(startPosAfter);
-            const endPosAfter = doc.positionAt(startOffsetAfter + insertedText.length);
+//         if (casedText !== insertedText) {
+//             // We need to replace the *inserted* text in the document AFTER the change.
+//             // Compute the end position using the AFTER document via positionAt(startOffset + insertedText.length)
+//             // Note: startOffsetBefore corresponds to same position in AFTER doc start (change.range.start).
+//             const startPosAfter = change.range.start;
+//             const startOffsetAfter = doc.offsetAt(startPosAfter);
+//             const endPosAfter = doc.positionAt(startOffsetAfter + insertedText.length);
 
-            fixes.push({
-                startOffsetAfter,
-                rangeAfter: new vscode.Range(startPosAfter, endPosAfter),
-                newText: casedText,
-            });
-        }
-    }
+//             fixes.push({
+//                 startOffsetAfter,
+//                 rangeAfter: new vscode.Range(startPosAfter, endPosAfter),
+//                 newText: casedText,
+//             });
+//         }
+//     }
 
-    if (fixes.length === 0) {
-        _docSnapshots.set(uriKey, doc.getText());
-        return;
-    }
+//     if (fixes.length === 0) {
+//         _docSnapshots.set(uriKey, doc.getText());
+//         return;
+//     }
 
-    // Sort back-to-front so earlier replacements don't shift offsets for later ones.
-    fixes.sort((a, b) => b.startOffsetAfter - a.startOffsetAfter);
+//     // Sort back-to-front so earlier replacements don't shift offsets for later ones.
+//     fixes.sort((a, b) => b.startOffsetAfter - a.startOffsetAfter);
 
-    try {
-        _isApplying.add(uriKey);
+//     try {
+//         _isApplying.add(uriKey);
 
-        await editor.edit(
-            (editBuilder) => {
-                for (const f of fixes) {
-                    editBuilder.replace(f.rangeAfter, f.newText);
-                }
-            },
-            {undoStopBefore: false, undoStopAfter: false},
-        );
-    } finally {
-        _isApplying.delete(uriKey);
-        // Update snapshot to the latest doc state (post-fix)
-        _docSnapshots.set(uriKey, doc.getText());
-    }
-}
+//         await editor.edit(
+//             (editBuilder) => {
+//                 for (const f of fixes) {
+//                     editBuilder.replace(f.rangeAfter, f.newText);
+//                 }
+//             },
+//             {undoStopBefore: false, undoStopAfter: false},
+//         );
+//     } finally {
+//         _isApplying.delete(uriKey);
+//         // Update snapshot to the latest doc state (post-fix)
+//         _docSnapshots.set(uriKey, doc.getText());
+//     }
+// }
 
 
 let selectedLinesStatusBarItem;
