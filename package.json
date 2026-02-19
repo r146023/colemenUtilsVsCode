@@ -3,7 +3,7 @@
 	"displayName": "ColemenUtils",
 	"description": "Comprehensive utility extension for text formatting and productivity",
 	"publisher": "colemen",
-	"version": "0.0.13",
+	"version": "0.0.15",
 	"target": "es2020",
 	"lib":["es2020"],
 	"module": "commonjs",
@@ -419,6 +419,11 @@
 			{
 				"command": "colemenutils.stripPlusAndHyphenLines",
 				"title": "Strip Plus and Hyphen Lines",
+				"category": "ColemenUtils Format"
+			},
+			{
+				"command": "colemenutils.wrapComments",
+				"title": "Wrap Comments",
 				"category": "ColemenUtils Format"
 			},
 			{
@@ -1182,6 +1187,10 @@
 				},
 				{
 					"command": "colemenutils.stripPlusAndHyphenLines",
+					"group": "1_parse"
+				},
+				{
+					"command": "colemenutils.wrapComments",
 					"group": "1_parse"
 				},
 				{

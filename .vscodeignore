@@ -22,7 +22,7 @@ npm-debug.log*
 **/.github/**
 **/.idea/**
 **/.vs/**
-**/node_modules/**
+
 
 
 
