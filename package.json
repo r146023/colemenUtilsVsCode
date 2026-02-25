@@ -3,7 +3,7 @@
 	"displayName": "ColemenUtils",
 	"description": "Comprehensive utility extension for text formatting and productivity",
 	"publisher": "colemen",
-	"version": "0.0.15",
+	"version": "0.0.18",
 	"target": "es2020",
 	"lib":["es2020"],
 	"module": "commonjs",
@@ -48,6 +48,17 @@
 			]
 		},
 		"commands": [
+
+			{
+				"command": "colemenutils.dailyContractSetDate",
+				"title": "Set Date",
+				"category": "Daily Contract"
+			},
+			{
+				"command": "colemenutils.dailyContractGenerateSummary",
+				"title": "Generate Summary",
+				"category": "Daily Contract"
+			},
 
 			{
 				"command": "colemenutils.toggleBracketColorizer",
@@ -758,6 +769,21 @@
 						"type": "boolean",
 						"default": true,
 						"description": "Apply the TODO highlight as a whole-line decoration. `colemenutils.todoCodeLens.isWholeLine`"
+					},
+					"colemenutils.todoCodeLens.includeLanguageTag": {
+						"type": "boolean",
+						"default": true,
+						"description": "Whether to include the language tag in the CodeLens text (e.g. `TODO (css)`) by default."
+					},
+					"colemenutils.todoCodeLens.useMarkdownTodo": {
+						"type": "boolean",
+						"default": true,
+						"description": "If the current file is a markdown file, use a markdown-friendly todo format (e.g. `- [ ] TODO: something`) in the CodeLens and when creating new todos."
+					},
+					"colemenutils.todoCodeLens.defaultTags": {
+						"type": "array",
+						"default": [],
+						"description": "Additional tags to include in newly created todos. These can be workspace specific or global."
 					}
 				}
 			},
@@ -1056,6 +1082,32 @@
 
 		],
 		"menus": {
+			"commandPalette": [
+				{
+					"command": "colemenutils.dailyContractGenerateSummary",
+					"when": "colemenutils.isContractMarkdown"
+				},
+				{
+					"command": "colemenutils.dailyContractSetDate",
+					"when": "colemenutils.isContractMarkdown"
+				},
+				{
+					"command": "colemenutils.FormatSVGContentCMD",
+					"when": "colemenutils.isXmlSvg"
+				},
+				{
+					"command": "colemenutils.CaptureSVGViewboxValue",
+					"when": "colemenutils.isXmlSvg"
+				},
+				{
+					"command": "colemenutils.CaptureSVGBody",
+					"when": "colemenutils.isXmlSvg"
+				},
+				{
+					"command": "colemenutils.SVGPropsToJSX",
+					"when": "colemenutils.isXmlSvg"
+				}
+			],
 			"editor/context": [
 				{
 					"submenu": "colemenutils.contextFormatGeneralSubmenu",
@@ -1064,7 +1116,12 @@
 				},
 				{
 					"submenu": "colemenutils.contextFormatSVGSubmenu",
-					"when": "editorLangId == 'svg' && editorTextFocus",
+					"when": "colemenutils.isXmlSvg",
+					"group": "navigation"
+				},
+				{
+					"submenu": "colemenutils.contextTodoContractSubmenu",
+					"when": "colemenutils.isContractMarkdown",
 					"group": "navigation"
 				},
 				{
@@ -1180,6 +1237,16 @@
 					"group": "1_main"
 				}
 			],
+			"colemenutils.contextTodoContractSubmenu": [
+				{
+					"command": "colemenutils.dailyContractSetDate",
+					"group": "1_main"
+				},
+				{
+					"command": "colemenutils.dailyContractGenerateSummary",
+					"group": "1_main"
+				}
+			],
 			"colemenutils.contextFormatGeneralSubmenu": [
 				{
 					"command": "colemenutils.normalizeBlankLines",
@@ -1291,7 +1358,14 @@
 			{
 				"id": "colemenutils.contextFormatSVGSubmenu",
 				"label": "SVG Format",
-				"icon": "$(tools)"
+				"when": "colemenutils.isXmlSvg",
+				"icon": "resources/hexagonAbstract.svg"
+			},
+			{
+				"id": "colemenutils.contextTodoContractSubmenu",
+				"label": "Todo Contract",
+				"when": "colemenutils.isContractMarkdown",
+				"icon": "resources/todo.svg"
 			},
 			{
 				"id": "colemenutils.contextSortSubmenu",
@@ -1311,7 +1385,14 @@
 			{
 				"id": "colemenutils.contextFormatSVGSubmenu",
 				"label": "SVG Format",
-				"icon": "$(tools)"
+				"when": "colemenutils.isXmlSvg",
+				"icon": "resources/hexagonAbstract.svg"
+			},
+			{
+				"id": "colemenutils.contextTodoContractSubmenu",
+				"label": "Todo Contract",
+				"when": "colemenutils.isContractMarkdown",
+				"icon": "resources/todo.svg"
 			},
 			{
 				"id": "colemenutils.contextSortSubmenu",
@@ -1329,6 +1410,7 @@
 				"icon": "$(debug)"
 			}
 		],
+
 		"colors": [
 			{
 				"id": "colemenutils.fileDecoration.error",
