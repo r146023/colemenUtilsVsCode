@@ -13,9 +13,28 @@ const vscode = require("vscode");
  *   XXX  => Done (timestamp = completion time)
  *
  * Comment prefix is forgiving: //, #, --, ;, /*, <!--
+ * 
+ * 
+ * // TODO []: (some,tags) just a test task
+ * Group 1: TODO
+ * Group 2: Timestamp in XXX, ignored in TODO
+ * Group 3: some,tags
+ * Group 4: just a test task
  */
 const TODO_RE =
   /^\s*(?:\/\/|#|--|;|\/\*+|<!--)\s*(TODO|XXX)\s*\[([^\]]*)\]\s*:\s*\(([^)]*)\)\s*(.*?)\s*(?:\*\/|-->|)?\s*$/;
+
+
+/**
+ * 
+ * - [x][2026-02-23 12:20:49] (Music,entertainment) KONGOS - Autocorrect
+ * Group 1 : x
+ * Group 2 : 2026-02-23 12:20:49
+ * Group 3 : Music,entertainment
+ * Group 4 : KONGOS - Autocorrect
+ *
+ */
+const MARKDOWN_TODO_RE = /^\s*-\s*\[([^\]]*)\]\s*(?:\[([^\]]*)\]|(?:TODO|XXX))\s*\(([^\)]*)\)\s*(.*)$/;
 
 const DEFAULT_OPTIONS = {
   includeGlobs: [
@@ -82,7 +101,7 @@ function safeJson(obj) {
  * @param {object} options
  * @returns {Promise<Array<{
  *   status:"open"|"done",
- *   kind:"TODO"|"XXX",
+ *   kind:"TODO"|" "|"XXX"|"X"|"x",
  *   timestamp:string,
  *   tags:string[],
  *   message:string,
@@ -120,9 +139,9 @@ async function scanWorkspaceTodos(options = {}) {
 
         let doc;
         try {
-        doc = await vscode.workspace.openTextDocument(uri);
+          doc = await vscode.workspace.openTextDocument(uri);
         } catch (err) {
-        continue;
+          continue;
         }
 
         const lineCount = doc.lineCount;
@@ -132,39 +151,50 @@ async function scanWorkspaceTodos(options = {}) {
             : lineCount;
 
         for (let i = 0; i < limit; i++) {
-        if (results.length >= opt.maxTodos) break;
+          if (results.length >= opt.maxTodos) break;
 
-        const line = doc.lineAt(i);
-        const text = line.text;
+          const line = doc.lineAt(i);
+          const text = line.text;
 
-        const m = text.match(TODO_RE);
-        if (!m) continue;
+          var isMarkdown = doc.languageId === "markdown";
+          var re = TODO_RE;
+          if(isMarkdown) re = MARKDOWN_TODO_RE;
+          const m = text.match(re);
+          if (!m){
+            continue;
+          }
 
-        const token = /** @type {"TODO"|"XXX"} */ (m[1]); // // TODO []: (javascript,frontend)  XXX
-        const bracket = m[2];
-        const tagBlob = m[3];
-        const msg = (m[4] || "").trim();
+          
 
-        const status = /** @type {"open"|"done"} */ (token === "TODO" ? "open" : "done");
-        const timestamp = /** @type {string} */ (token === "XXX" ? parseTimestamp(bracket) : "");
+          // // TO DO []: (javascript,frontend)  X XX
+          const incomplete_tokens = ["TODO"," ","FIXME","BUG","HACK"];
+          var token = /** @type {"TODO"|" "|"XXX"|"X"|"x"} */ (m[1]); 
+          var bracket = m[2];
+          var tagBlob = m[3];
+          var msg = (m[4] || "").trim();
 
-        const tags = /** @type {string[]} */ (normalizeTags(tagBlob));
+          var status = /** @type {"open"|"done"} */ (incomplete_tokens.includes(token) ? "open" : "done");
+          // var status = /** @type {"open"|"done"} */ (token === "TODO" ? "open" : "done");
+          var timestamp = /** @type {string} */ (token === "XXX" ? parseTimestamp(bracket) : "");
 
-        // Column: start of TODO/XXX token
-        const idx = text.toUpperCase().indexOf(token);
-        const col = idx >= 0 ? idx : 0;
+          var tags = /** @type {string[]} */ (normalizeTags(tagBlob));
 
-        results.push({
-            status: status,
-            kind: token,
-            timestamp: timestamp,
-            tags: tags,
-            message: msg,
-            uri: /** @type {vscode.Uri} */ (uri),
-            line: i,
-            column: col,
-            raw: text.trim(),
-        });
+
+          // Column: start of TODO/XXX token
+          const idx = text.toUpperCase().indexOf(token);
+          const col = idx >= 0 ? idx : 0;
+
+          results.push({
+              status: status,
+              kind: token,
+              timestamp: timestamp,
+              tags: tags,
+              message: msg,
+              uri: /** @type {vscode.Uri} */ (uri),
+              line: i,
+              column: col,
+              raw: text.trim(),
+          });
     }
 }
 
