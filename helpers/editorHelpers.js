@@ -1,5 +1,10 @@
 const vscode = require('vscode');
 
+
+function pad(n) { return n.toString().padStart(2, '0'); }
+
+
+
 function mostCommonNonAlphanumeric(str) {
     const counts = {};
     for (const char of str) {
@@ -186,5 +191,6 @@ module.exports = {
     matchCasing,
     getText,
     getTextAsLinesArray,
-    hasSelection
+    hasSelection,
+    pad
 };
