@@ -9,6 +9,40 @@ try {
     console.error('xml-js package not found. SVG commands will not work.');
 }
 
+
+
+
+
+function isSvgEditor(editor) {
+    if (!editor) return false;
+
+    const doc = editor.document;
+    const valid_langs = ["xml","svg","html","typescriptreact","jsx","tsx"];
+
+    // if (doc.languageId !== "xml") return false;
+    if (!valid_langs.includes(doc.languageId)) return false;
+    if (doc.uri.scheme !== "file") return false;
+    // return true;
+    const base = (doc.uri.path.split("/").pop() || "").toLowerCase();
+
+    return (
+        base.includes(".svg")||
+        base.includes(".jsx")||
+        base.includes(".tsx")
+    );
+}
+
+async function refreshSvgContext() {
+    const ok = isSvgEditor(vscode.window.activeTextEditor);
+
+    await vscode.commands.executeCommand(
+        "setContext",
+        "colemenutils.isXmlSvg",
+        ok
+    );
+}
+
+
 /**
  * SVG Commands Module for ColemenUtils
  * Handles all SVG processing utilities
@@ -19,6 +53,15 @@ try {
  * @param {vscode.ExtensionContext} context - VS Code extension context
  */
 function registerSvgCommands(context) {
+    vscode.window.onDidChangeActiveTextEditor(refreshSvgContext),
+    vscode.workspace.onDidOpenTextDocument(refreshSvgContext),
+    vscode.workspace.onDidCloseTextDocument(refreshSvgContext),
+    vscode.workspace.onDidChangeTextDocument((e) => {
+        const active = vscode.window.activeTextEditor.document;
+        if (active && e.document.uri.toString() === active.uri.toString()) {
+            refreshSvgContext();
+        }
+    })
     context.subscriptions.push(
         vscode.commands.registerCommand('colemenutils.FormatSVGContentCMD', formatSVGContent),
         vscode.commands.registerCommand('colemenutils.CaptureSVGViewboxValue', captureSVGViewboxValue),
