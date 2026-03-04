@@ -3,7 +3,7 @@
 	"displayName": "ColemenUtils",
 	"description": "Comprehensive utility extension for text formatting and productivity",
 	"publisher": "colemen",
-	"version": "0.0.18",
+	"version": "0.0.20",
 	"target": "es2020",
 	"lib":["es2020"],
 	"module": "commonjs",
@@ -674,6 +674,20 @@
 				}
 			},
 			{
+				"title": "likertWhitelist",
+				"type": "array",
+				"default": [],
+				"description": "Whitelist of (tags,label) pairs that should use Likert CodeLens in daily contract files.",
+				"items": {
+					"type": "object",
+					"properties": {
+					"tags": { "type": "string", "description": "Comma-separated tags, e.g. health,sleep" },
+					"label": { "type": "string", "description": "Exact task label text, e.g. Sleep Quality" }
+					},
+					"required": ["tags", "label"]
+				}
+				},
+			{
 				"title": "Colemen Utils Mstep Highlighting",
 				"properties": {
 					"colemenutils.mstepHighlighting.tagColors": {
@@ -784,6 +798,42 @@
 						"type": "array",
 						"default": [],
 						"description": "Additional tags to include in newly created todos. These can be workspace specific or global."
+					},
+					"colemenutils.todoCodeLens.likertWhitelist": {
+						"type": "array",
+						"default": [],
+						"markdownDescription": "Defines which TODO items in **Daily Contract** files should use Likert-scale CodeLens buttons instead of the normal **Complete** button.\n\nEach entry must match the TODO **tags** and **label** exactly.\n\nExample TODO:\n\n```markdown\n- [ ] TODO (health,sleep) Sleep Quality\n```\n\nExample configuration:\n\n```json\n[\n  { \"tags\": \"health,sleep\", \"label\": \"Sleep Quality\", \"likert\": \"goodBad\" },\n  { \"tags\": \"health,focus\", \"label\": \"Focus Quality\", \"likert\": \"goodBad\" },\n  { \"tags\": \"general\", \"label\": \"I feel like I had a productive day\", \"likert\": \"agreement\" }\n]\n```\n\nBuilt-in Likert types:\n\n• **goodBad** – Very Good → Very Bad  \n• **agreement** – Strongly Agree → Strongly Disagree  \n• **frequency** – Always → Never  \n• **effort** – Very High → Very Low\n\nYou can define additional types using **`colemenutils.todoCodeLens.likertTypes`**.",
+						"items": {
+							"type": "object",
+							"properties": {
+							"tags": {
+								"type": "string",
+								"description": "Comma-separated tags inside the TODO parentheses. Example: health,sleep"
+							},
+							"label": {
+								"type": "string",
+								"description": "Exact TODO description text."
+							},
+							"likert": {
+								"type": "string",
+								"default": "goodBad",
+								"description": "Likert scale type to use for this entry."
+							}
+							},
+							"required": ["tags", "label"]
+						}
+					},
+
+					"colemenutils.todoCodeLens.likertTypes": {
+						"type": "object",
+						"default": {},
+						"markdownDescription": "Defines **custom Likert scales** used by the TODO Likert system.\n\nEach key defines a scale name, and the value is an ordered array of response options.\n\nExample:\n\n```json\n{\n  \"agreement\": [\n    \"Strongly Agree\",\n    \"Agree\",\n    \"Somewhat Agree\",\n    \"Neutral\",\n    \"Somewhat Disagree\",\n    \"Disagree\",\n    \"Strongly Disagree\"\n  ],\n\n  \"mood\": [\n    \"Amazing\",\n    \"Great\",\n    \"Good\",\n    \"Neutral\",\n    \"Bad\",\n    \"Terrible\"\n  ]\n}\n```\n\nCustom scales override built-in scales if the same key is used.",
+						"additionalProperties": {
+							"type": "array",
+							"items": {
+							"type": "string"
+							}
+						}
 					}
 				}
 			},
