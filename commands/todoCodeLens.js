@@ -20,7 +20,6 @@ function formatDateForTodo(d) {
     return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
 }
 
-// TODO []: (javascript) something
 
 /**
  * Daily contract detection (conservative):

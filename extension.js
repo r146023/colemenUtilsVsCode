@@ -24,6 +24,9 @@ const { activateStatusCodeLens } = require("./commands/statusCodeLens");
 const { registerDailyContractCommands } = require("./commands/dailyContractManager");
 const { registerContractCompletionDecorations } = require("./todo/contractCompletionDecorations");
 const { registerContractCompletionStatus } = require("./todo/contractCompletionStatus");
+const { registerMarkdownBomTableCommands } = require("./commands/MarkdownBOMTotal");
+const { registerMarkdownLumberTableCommands } = require("./commands/markdownLumberTableCommands");
+const { registerKaiKaiHelper } = require('./kaikaiHelper/registerKaiKaiHelper');
 // const { registerAutoRenameTag } = require('./commands/autoRenameTag');
 // const { registerFileDecorations } = require('./commands/fileDecorationProvider');
 const { registerMstep } = require('./commands/mstep');
@@ -72,6 +75,9 @@ function activate(context) {
     registerJsonCommands(context);
     registerDebugCommands(context);
     registerToggleCopilot(context);
+    registerMarkdownBomTableCommands(context);
+    registerMarkdownLumberTableCommands(context);
+    registerKaiKaiHelper(context);
 
     registerDailyContractCommands(context);
     registerContractCompletionDecorations(context);

@@ -3,7 +3,7 @@
 	"displayName": "ColemenUtils",
 	"description": "Comprehensive utility extension for text formatting and productivity",
 	"publisher": "colemen",
-	"version": "0.0.20",
+	"version": "0.0.22",
 	"target": "es2020",
 	"lib":["es2020"],
 	"module": "commonjs",
@@ -48,7 +48,18 @@
 			]
 		},
 		"commands": [
-
+			{
+				"command": "colemenutils.updateMarkdownBomTables",
+				"title": "ColemenUtils: Update Markdown BOM Tables"
+			},
+			{
+				"command": "colemenutils.updateMarkdownLumberTables",
+				"title": "ColemenUtils: Update Markdown Lumber Tables"
+			},
+			{
+				"command": "colemenutils.insertMarkdownLumberTable",
+				"title": "ColemenUtils: Insert Markdown Lumber Table"
+			},
 			{
 				"command": "colemenutils.dailyContractSetDate",
 				"title": "Set Date",
@@ -670,6 +681,41 @@
 						"type": "number",
 						"default": 2,
 						"description": "Number of spaces for JSON indentation"
+					}
+				}
+			},
+			{
+				"title": "ColemenUtils KaiKai Theme Assist",
+				"properties": {
+					"colemenutils.kaiKaiThemeAssist.enabled": {
+					"type": "boolean",
+					"default": false,
+					"description": "Enable KaiKai theme hover and autocomplete helpers."
+					},
+					"colemenutils.kaiKaiThemeAssist.hover.enabled": {
+					"type": "boolean",
+					"default": true,
+					"description": "Enable KaiKai theme hover tooltips."
+					},
+					"colemenutils.kaiKaiThemeAssist.completion.enabled": {
+					"type": "boolean",
+					"default": true,
+					"description": "Enable KaiKai theme autocomplete."
+					},
+					"colemenutils.kaiKaiThemeAssist.onlyInsideBuildThemeKeyMap": {
+					"type": "boolean",
+					"default": true,
+					"description": "Restrict KaiKai theme helpers to buildThemeKeyMap functions."
+					},
+					"colemenutils.kaiKaiThemeAssist.includeLegacyAliasesInCompletion": {
+					"type": "boolean",
+					"default": false,
+					"description": "Include legacy or compatibility aliases in autocomplete suggestions."
+					},
+					"colemenutils.kaiKaiThemeAssist.preferCanonicalPreview": {
+					"type": "boolean",
+					"default": true,
+					"description": "Show canonical resolved path previews in hover popups."
 					}
 				}
 			},

@@ -16,8 +16,10 @@ function isContractMarkdownDoc(doc) {
 }
 
 function countTasksFromText(content) {
-    const TODO_REGEX = /(\b(?:-\s*\[\s*\]\s*)?\b(?:TODO|FIXME)\s*|\b(?:TODO|FIXME)\s*\[\s*\])/gi;
-    const TODO_COMPLETE_REGEX = /(?:-\s*\[[xX]\]\s*\[\d{4}-\d{2}-\d{2}\s*\d{2}:\d{2}:\d{2}\]|\bXXX\b)/gi;
+    const TODO_REGEX = /(?:(-\s*\[\s*\]\s*)\s*(TODO|FIXME|BUG)\s*|\b(TODO|FIXME|BUG)\s*\[\s*\])/gi;
+    // const TODO_REGEX = /(\b(?:-\s*\[\s*\]\s*)?\b(?:TODO|FIXME)\s*|\b(?:TODO|FIXME)\s*\[\s*\])/gi;
+    const TODO_COMPLETE_REGEX = /(?:-\s*\[[xX]\]\s*\[\d{4}-\d{2}-\d{2}\s*\d{2}:\d{2}:\d{2}\]|\bXXX\s*\[\d{4}-\d{2}-\d{2}\s*\d{2}:\d{2}:\d{2}\])/gi;
+    // const TODO_COMPLETE_REGEX = /(?:-\s*\[[xX]\]\s*\[\d{4}-\d{2}-\d{2}\s*\d{2}:\d{2}:\d{2}\]|\bXXX\b)/gi;
 
     const completed = typeof content === "string" ? [...content.matchAll(TODO_COMPLETE_REGEX)].length : 0;
     const incomplete = typeof content === "string" ? [...content.matchAll(TODO_REGEX)].length : 0;
